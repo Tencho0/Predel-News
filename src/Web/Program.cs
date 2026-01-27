@@ -70,6 +70,14 @@ public static class SecurityHeadersMiddlewareExtensions
     {
         return app.Use(async (context, next) =>
         {
+            // Skip security headers for Umbraco backoffice/installer
+            var path = context.Request.Path.Value ?? "";
+            if (path.StartsWith("/umbraco", StringComparison.OrdinalIgnoreCase))
+            {
+                await next();
+                return;
+            }
+
             var headers = context.Response.Headers;
 
             headers["X-Content-Type-Options"] = "nosniff";
