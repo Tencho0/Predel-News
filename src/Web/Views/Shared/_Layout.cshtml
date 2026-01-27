@@ -1,0 +1,94 @@
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Extensions
+@model BasePageViewModel
+@{
+    var siteName = "Predel News";
+    var pageTitle = !string.IsNullOrEmpty(Model?.PageTitle) ? $"{Model.PageTitle} | {siteName}" : siteName;
+    var metaDescription = Model?.MetaDescription ?? "Latest news and articles from Predel News";
+    var canonicalUrl = Model?.CanonicalUrl ?? Context.Request.GetDisplayUrl();
+    var ogTitle = Model?.OgTitle ?? Model?.PageTitle ?? siteName;
+    var ogDescription = Model?.OgDescription ?? metaDescription;
+    var ogImage = Model?.OgImage ?? "/images/og-default.jpg";
+    var ogType = Model?.OgType ?? "website";
+    var twitterCard = Model?.TwitterCard ?? "summary_large_image";
+    var twitterTitle = Model?.TwitterTitle ?? ogTitle;
+    var twitterDescription = Model?.TwitterDescription ?? ogDescription;
+    var twitterImage = Model?.TwitterImage ?? ogImage;
+}
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>@pageTitle</title>
+    <meta name="description" content="@metaDescription" />
+    @if (!string.IsNullOrEmpty(Model?.MetaKeywords))
+    {
+        <meta name="keywords" content="@Model.MetaKeywords" />
+    }
+
+    <link rel="canonical" href="@canonicalUrl" />
+
+    <meta property="og:site_name" content="@siteName" />
+    <meta property="og:type" content="@ogType" />
+    <meta property="og:title" content="@ogTitle" />
+    <meta property="og:description" content="@ogDescription" />
+    <meta property="og:image" content="@ogImage" />
+    <meta property="og:url" content="@canonicalUrl" />
+    <meta property="og:locale" content="bg_BG" />
+
+    <meta name="twitter:card" content="@twitterCard" />
+    <meta name="twitter:title" content="@twitterTitle" />
+    <meta name="twitter:description" content="@twitterDescription" />
+    <meta name="twitter:image" content="@twitterImage" />
+
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content="#1a1a2e" />
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+
+    <link rel="preconnect" href="/" />
+    <link rel="dns-prefetch" href="/" />
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+
+    @await Html.PartialAsync("Partials/_SchemaOrg", Model)
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    @await Html.PartialAsync("Partials/_Header", Model)
+
+    <main id="main-content" class="main-content">
+        @if (Model?.Breadcrumbs?.Any() == true)
+        {
+            @await Html.PartialAsync("Partials/_Breadcrumbs", Model.Breadcrumbs)
+        }
+
+        <div class="container">
+            <div class="content-wrapper">
+                <div class="main-column">
+                    @RenderBody()
+                </div>
+
+                <aside class="sidebar" aria-label="Sidebar">
+                    @await Html.PartialAsync("Partials/_Sidebar", Model)
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    @await Html.PartialAsync("Partials/_Footer", Model)
+
+    @await Html.PartialAsync("Partials/_MobileMenu", Model)
+
+    <script src="~/js/site.js" asp-append-version="true" defer></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

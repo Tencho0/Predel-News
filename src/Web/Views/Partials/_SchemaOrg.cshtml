@@ -1,0 +1,35 @@
+@model BasePageViewModel
+@{
+    var siteName = "Predel News";
+    var siteUrl = Context.Request.Scheme + "://" + Context.Request.Host;
+}
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "WebSite",
+    "name": "@siteName",
+    "url": "@siteUrl",
+    "potentialAction": {
+        "@@type": "SearchAction",
+        "target": {
+            "@@type": "EntryPoint",
+            "urlTemplate": "@(siteUrl)/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+    }
+}
+</script>
+
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "Organization",
+    "name": "@siteName",
+    "url": "@siteUrl",
+    "logo": {
+        "@@type": "ImageObject",
+        "url": "@(siteUrl)/images/logo.png"
+    },
+    "sameAs": []
+}
+</script>

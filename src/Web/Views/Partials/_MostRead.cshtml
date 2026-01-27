@@ -1,0 +1,40 @@
+@model IReadOnlyList<ArticleSummary>
+<div class="sidebar-widget most-read-widget">
+    <h3 class="widget-title">Most Read</h3>
+
+    @if (Model?.Any() == true)
+    {
+        <ol class="most-read-list">
+            @{
+                var rank = 1;
+            }
+            @foreach (var article in Model)
+            {
+                <li class="most-read-item">
+                    <a href="@article.GetUrl()" class="most-read-link">
+                        <span class="most-read-rank">@rank</span>
+                        <div class="most-read-content">
+                            <span class="most-read-category">@article.CategoryName</span>
+                            <h4 class="most-read-title">@article.Title</h4>
+                        </div>
+                        @if (article.FeaturedImage != null)
+                        {
+                            <figure class="most-read-image">
+                                <img src="@article.FeaturedImage.GetCropUrl(80, 60)"
+                                     alt=""
+                                     width="80"
+                                     height="60"
+                                     loading="lazy" />
+                            </figure>
+                        }
+                    </a>
+                </li>
+                rank++;
+            }
+        </ol>
+    }
+    else
+    {
+        <p class="widget-empty">No articles yet.</p>
+    }
+</div>

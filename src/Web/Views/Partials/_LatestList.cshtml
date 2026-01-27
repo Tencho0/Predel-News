@@ -1,0 +1,103 @@
+@model PagedResult<ArticleSummary>
+@{
+    var sectionTitle = ViewData["SectionTitle"] as string ?? "Latest News";
+    var showPagination = ViewData["ShowPagination"] as bool? ?? true;
+    var baseUrl = ViewData["BaseUrl"] as string ?? "";
+}
+<section class="latest-section">
+    <header class="section-header">
+        <h2 class="section-title">@sectionTitle</h2>
+    </header>
+
+    @if (Model?.Items.Any() == true)
+    {
+        <div class="articles-list">
+            @foreach (var article in Model.Items)
+            {
+                <article class="article-card article-card-horizontal">
+                    <a href="@article.GetUrl()" class="article-card-link">
+                        @if (article.FeaturedImage != null)
+                        {
+                            <figure class="article-card-image">
+                                <img src="@article.FeaturedImage.GetCropUrl(300, 200)"
+                                     alt="@(article.FeaturedImage.AltText ?? article.Title)"
+                                     width="300"
+                                     height="200"
+                                     loading="lazy" />
+                            </figure>
+                        }
+                        <div class="article-card-content">
+                            <div class="article-card-meta">
+                                <span class="article-category">@article.CategoryName</span>
+                                <time datetime="@article.PublishDate.ToString("yyyy-MM-ddTHH:mm:ss")">
+                                    @article.PublishDate.ToString("d MMM yyyy", new System.Globalization.CultureInfo("bg-BG"))
+                                </time>
+                            </div>
+                            <h3 class="article-card-title">@article.Title</h3>
+                            @if (!string.IsNullOrEmpty(article.Excerpt))
+                            {
+                                <p class="article-card-excerpt">@article.Excerpt</p>
+                            }
+                            <footer class="article-card-footer">
+                                <span class="article-author">@article.AuthorName</span>
+                                @if (article.ViewCount > 0)
+                                {
+                                    <span class="article-views">
+                                        <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        @article.ViewCount
+                                    </span>
+                                }
+                            </footer>
+                        </div>
+                    </a>
+                </article>
+            }
+        </div>
+
+        @if (showPagination && Model.TotalPages > 1)
+        {
+            <nav class="pagination" aria-label="Pagination">
+                <ul class="pagination-list">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <li class="pagination-item">
+                            <a href="@baseUrl?page=@(Model.PageNumber - 1)" class="pagination-link pagination-prev" aria-label="Previous page">
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                </svg>
+                            </a>
+                        </li>
+                    }
+
+                    @for (var i = 1; i <= Model.TotalPages; i++)
+                    {
+                        var isCurrent = i == Model.PageNumber;
+                        <li class="pagination-item">
+                            <a href="@baseUrl?page=@i"
+                               class="pagination-link @(isCurrent ? "is-current" : "")"
+                               @(isCurrent ? "aria-current=page" : "")>@i</a>
+                        </li>
+                    }
+
+                    @if (Model.HasNextPage)
+                    {
+                        <li class="pagination-item">
+                            <a href="@baseUrl?page=@(Model.PageNumber + 1)" class="pagination-link pagination-next" aria-label="Next page">
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    }
+    else
+    {
+        <p class="no-articles">No articles found.</p>
+    }
+</section>

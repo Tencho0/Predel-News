@@ -1,0 +1,43 @@
+@model BasePageViewModel
+<div class="sidebar-content">
+    @{
+        ViewData["Position"] = "sidebar-top";
+        ViewData["Size"] = "300x250";
+    }
+    @await Html.PartialAsync("Partials/_AdSlot")
+
+    @await Html.PartialAsync("Partials/_MostRead", Model?.SidebarMostRead ?? Array.Empty<ArticleSummary>())
+
+    @{
+        ViewData["Position"] = "sidebar-middle";
+        ViewData["Size"] = "300x600";
+    }
+    @await Html.PartialAsync("Partials/_AdSlot")
+
+    <div class="sidebar-widget categories-widget">
+        <h3 class="widget-title">Categories</h3>
+        <ul class="categories-list">
+            @if (Model?.NavigationCategories != null)
+            {
+                foreach (var category in Model.NavigationCategories)
+                {
+                    <li class="category-item">
+                        <a href="@category.GetUrl()" class="category-link">
+                            <span class="category-name">@category.Name</span>
+                            @if (category.ArticleCount > 0)
+                            {
+                                <span class="category-count">@category.ArticleCount</span>
+                            }
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+
+    @{
+        ViewData["Position"] = "sidebar-bottom";
+        ViewData["Size"] = "300x250";
+    }
+    @await Html.PartialAsync("Partials/_AdSlot")
+</div>

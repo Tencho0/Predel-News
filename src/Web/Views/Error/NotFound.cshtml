@@ -1,0 +1,33 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ErrorViewModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Context.Response.StatusCode = 404;
+}
+
+<div class="error-page error-404">
+    <div class="error-content">
+        <h1 class="error-code">404</h1>
+        <h2 class="error-title">Page Not Found</h2>
+        <p class="error-message">
+            Sorry, the page you are looking for does not exist or has been moved.
+        </p>
+
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">Go to Homepage</a>
+            <a href="/search" class="btn btn-secondary">Search Articles</a>
+        </div>
+
+        <div class="error-suggestions">
+            <h3>Popular Categories</h3>
+            <ul class="suggestions-list">
+                @if (Model?.NavigationCategories != null)
+                {
+                    foreach (var category in Model.NavigationCategories.Take(5))
+                    {
+                        <li><a href="@category.GetUrl()">@category.Name</a></li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+</div>

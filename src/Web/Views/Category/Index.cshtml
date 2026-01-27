@@ -1,0 +1,54 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<CategoryViewModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="category-page">
+    <header class="page-header">
+        <h1 class="page-title">@Model.Category.Name</h1>
+        @if (!string.IsNullOrEmpty(Model.Category.Description))
+        {
+            <p class="page-description">@Model.Category.Description</p>
+        }
+    </header>
+
+    @if (Model.FeaturedInCategory?.Any() == true)
+    {
+        <section class="category-featured" aria-label="Featured in @Model.Category.Name">
+            <div class="featured-grid">
+                @foreach (var article in Model.FeaturedInCategory.Take(3))
+                {
+                    <article class="featured-card">
+                        <a href="@article.GetUrl()" class="featured-card-link">
+                            @if (article.FeaturedImage != null)
+                            {
+                                <figure class="featured-card-image">
+                                    <img src="@article.FeaturedImage.GetCropUrl(400, 250)"
+                                         alt="@(article.FeaturedImage.AltText ?? article.Title)"
+                                         width="400"
+                                         height="250"
+                                         loading="lazy" />
+                                </figure>
+                            }
+                            <div class="featured-card-content">
+                                <h2 class="featured-card-title">@article.Title</h2>
+                                <time datetime="@article.PublishDate.ToString("yyyy-MM-ddTHH:mm:ss")">
+                                    @article.PublishDate.ToString("d MMM yyyy", new System.Globalization.CultureInfo("bg-BG"))
+                                </time>
+                            </div>
+                        </a>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+
+    @await Html.PartialAsync("Partials/_AdSlot", new { Position = "category-top", Size = "728x90" })
+
+    @{
+        ViewData["SectionTitle"] = "All Articles";
+        ViewData["ShowPagination"] = true;
+        ViewData["BaseUrl"] = Model.Category.GetUrl();
+    }
+    @await Html.PartialAsync("Partials/_LatestList", Model.Articles)
+</div>

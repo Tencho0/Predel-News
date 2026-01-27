@@ -1,0 +1,40 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ErrorViewModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var statusCode = Model?.StatusCode ?? 500;
+    Context.Response.StatusCode = statusCode;
+}
+
+<div class="error-page error-@statusCode">
+    <div class="error-content">
+        <h1 class="error-code">@statusCode</h1>
+        <h2 class="error-title">
+            @switch (statusCode)
+            {
+                case 400:
+                    <text>Bad Request</text>
+                    break;
+                case 403:
+                    <text>Forbidden</text>
+                    break;
+                case 404:
+                    <text>Page Not Found</text>
+                    break;
+                case 500:
+                    <text>Server Error</text>
+                    break;
+                default:
+                    <text>Error</text>
+                    break;
+            }
+        </h2>
+        <p class="error-message">
+            @(Model?.ErrorMessage ?? "An unexpected error has occurred. Please try again later.")
+        </p>
+
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">Go to Homepage</a>
+            <button type="button" class="btn btn-secondary" onclick="history.back()">Go Back</button>
+        </div>
+    </div>
+</div>

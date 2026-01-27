@@ -1,0 +1,21 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<TagViewModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="tag-page">
+    <header class="page-header">
+        <span class="page-label">Tag</span>
+        <h1 class="page-title">#@Model.Tag.Name</h1>
+        <p class="page-count">@Model.Articles.TotalItems articles</p>
+    </header>
+
+    @await Html.PartialAsync("Partials/_AdSlot", new { Position = "tag-top", Size = "728x90" })
+
+    @{
+        ViewData["SectionTitle"] = "Articles";
+        ViewData["ShowPagination"] = true;
+        ViewData["BaseUrl"] = Model.Tag.GetUrl();
+    }
+    @await Html.PartialAsync("Partials/_LatestList", Model.Articles)
+</div>
