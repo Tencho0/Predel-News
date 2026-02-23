@@ -2,7 +2,7 @@
 
 **Product:** PredelNews — Regional News Website for Southwest Bulgaria
 **Domain:** predelnews.com
-**Platform:** Umbraco 13 LTS (.NET 8)
+**Platform:** Umbraco 14 LTS (.NET 10)
 **Document owner:** Product Manager
 **Status:** Draft v1.0
 **Last updated:** 2025-02-23
@@ -14,7 +14,7 @@
 
 ## 1. Executive Summary
 
-PredelNews is a Bulgarian-language news website focused on original journalism for Southwest Bulgaria, with the Blagoevgrad region as its primary coverage area. The site will be built on Umbraco 13 LTS and developed using Claude Code. It will launch with zero legacy content and a lean editorial team (1 editor, 1–3 writers).
+PredelNews is a Bulgarian-language news website focused on original journalism for Southwest Bulgaria, with the Blagoevgrad region as its primary coverage area. The site will be built on Umbraco 14 LTS and developed using Claude Code. It will launch with zero legacy content and a lean editorial team (1 editor, 1–3 writers).
 
 The product serves two core jobs: (1) give residents of underserved regional communities a trustworthy, fast-loading source for local news, and (2) provide a sustainable monetization model through display advertising (Google AdSense) and clearly labeled sponsored/paid articles.
 
@@ -636,8 +636,8 @@ These rules are non-negotiable and encoded in the CMS:
 
 | Tool | Purpose | Phase |
 |------|---------|-------|
-| Umbraco 13 LTS | CMS | 1 |
-| .NET 8 | Runtime | 1 |
+| Umbraco 14 LTS | CMS | 1 |
+| .NET 10 | Runtime | 1 |
 | Google AdSense | Display advertising | 1 |
 | Google Analytics 4 | Traffic analytics | 1 |
 | Hosting provider (TBD) | Web hosting with .NET support | 1 |
