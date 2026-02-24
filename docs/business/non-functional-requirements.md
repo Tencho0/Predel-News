@@ -2,7 +2,7 @@
 
 **Product:** PredelNews — Regional News Website for Southwest Bulgaria  
 **Domain:** predelnews.com  
-**Platform:** Umbraco 14 LTS (.NET 10) on Windows VPS (IIS)  
+**Platform:** Umbraco 17 LTS (.NET 10) on Windows VPS (IIS)  
 **Document owner:** Solutions Architect / QA Lead  
 **Status:** Draft v1.0  
 **Last updated:** 2025-02-23
