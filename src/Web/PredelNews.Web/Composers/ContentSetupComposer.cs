@@ -19,5 +19,6 @@ public class ContentSetupComposer : IComposer
         builder.AddNotificationAsyncHandler<ContentSavingNotification, SponsoredContentGuardHandler>();
         builder.AddNotificationAsyncHandler<ContentSavingNotification, CoverImageAltTextValidator>();
         builder.AddNotificationAsyncHandler<ContentSavingNotification, ArticleTagCountValidator>();
+        builder.AddNotificationAsyncHandler<ContentDeletingNotification, TaxonomyDeleteGuardHandler>();
     }
 }

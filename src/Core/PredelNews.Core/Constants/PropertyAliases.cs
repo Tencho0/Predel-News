@@ -50,9 +50,12 @@ public static class PropertyAliases
     public const string AdsenseScriptTag = "adsenseScriptTag";
     public const string Ga4MeasurementId = "ga4MeasurementId";
     public const string FacebookUrl = "facebookUrl";
+    public const string InstagramUrl = "instagramUrl";
     public const string DefaultSeoDescription = "defaultSeoDescription";
     public const string DefaultOgImage = "defaultOgImage";
     public const string FooterCopyrightText = "footerCopyrightText";
+    public const string BannedWordsList = "bannedWordsList";
+    public const string MaintenanceMode = "maintenanceMode";
 
     // StaticPage
     public const string PageTitle = "pageTitle";

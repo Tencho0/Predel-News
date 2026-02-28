@@ -39,9 +39,12 @@ public class SiteSettingsService : ISiteSettingsService
             AdsenseScriptTag = settingsNode.Value<string>(PropertyAliases.AdsenseScriptTag),
             Ga4MeasurementId = settingsNode.Value<string>(PropertyAliases.Ga4MeasurementId),
             FacebookUrl = settingsNode.Value<string>(PropertyAliases.FacebookUrl),
+            InstagramUrl = settingsNode.Value<string>(PropertyAliases.InstagramUrl),
             DefaultSeoDescription = settingsNode.Value<string>(PropertyAliases.DefaultSeoDescription),
             DefaultOgImageUrl = settingsNode.Value<IPublishedContent>(PropertyAliases.DefaultOgImage)?.Url(),
             FooterCopyrightText = settingsNode.Value<string>(PropertyAliases.FooterCopyrightText),
+            BannedWordsList = settingsNode.Value<string>(PropertyAliases.BannedWordsList),
+            MaintenanceMode = settingsNode.Value<bool>(PropertyAliases.MaintenanceMode),
         };
     }
 }

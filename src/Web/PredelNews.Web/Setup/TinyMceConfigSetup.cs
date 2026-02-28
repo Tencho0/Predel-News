@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using PredelNews.Core.Constants;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -17,7 +18,7 @@ public class TinyMceConfigSetup : INotificationAsyncHandler<UmbracoApplicationSt
     private readonly ILogger<TinyMceConfigSetup> _logger;
 
     public static readonly Guid ArticleRteKey = Guid.Parse("a1b2c3d4-e5f6-4000-8000-000000000001");
-    public const string ArticleRteDataTypeName = "Article Body RTE";
+    public static readonly Guid ArticleTagsPickerKey = Guid.Parse("a1b2c3d4-e5f6-4000-8000-000000000002");
 
     public TinyMceConfigSetup(
         IDataTypeService dataTypeService,
@@ -33,12 +34,14 @@ public class TinyMceConfigSetup : INotificationAsyncHandler<UmbracoApplicationSt
 
     public async Task HandleAsync(UmbracoApplicationStartedNotification notification, CancellationToken cancellationToken)
     {
-        var existing = await _dataTypeService.GetAsync(ArticleRteKey);
-        if (existing != null)
-        {
-            _logger.LogInformation("PredelNews: Article Body RTE data type already exists — skipping");
+        await EnsureArticleRteAsync();
+        await EnsureArticleTagsPickerAsync();
+    }
+
+    private async Task EnsureArticleRteAsync()
+    {
+        if (await _dataTypeService.GetAsync(ArticleRteKey) != null)
             return;
-        }
 
         var richTextEditor = _propertyEditors
             .FirstOrDefault(e => e.Alias == Constants.PropertyEditors.Aliases.RichText)
@@ -47,7 +50,7 @@ public class TinyMceConfigSetup : INotificationAsyncHandler<UmbracoApplicationSt
         var dataType = new DataType(richTextEditor, _serializer, parentId: -1)
         {
             Key = ArticleRteKey,
-            Name = ArticleRteDataTypeName,
+            Name = "Article Body RTE",
             EditorUiAlias = "Umb.PropertyEditorUi.Tiptap",
             DatabaseType = ValueStorageType.Ntext,
         };
@@ -89,6 +92,36 @@ public class TinyMceConfigSetup : INotificationAsyncHandler<UmbracoApplicationSt
         };
 
         await _dataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-        _logger.LogInformation("PredelNews: Created custom Article Body RTE data type");
+        _logger.LogInformation("PredelNews: Created Article Body RTE data type");
+    }
+
+    private async Task EnsureArticleTagsPickerAsync()
+    {
+        if (await _dataTypeService.GetAsync(ArticleTagsPickerKey) != null)
+            return;
+
+        var mntpEditor = _propertyEditors
+            .FirstOrDefault(e => e.Alias == Constants.PropertyEditors.Aliases.MultiNodeTreePicker)
+            ?? throw new InvalidOperationException("MultiNodeTreePicker property editor not found");
+
+        var dataType = new DataType(mntpEditor, _serializer, parentId: -1)
+        {
+            Key = ArticleTagsPickerKey,
+            Name = "Article Tags Picker",
+            EditorUiAlias = "Umb.PropertyEditorUi.ContentPicker",
+            DatabaseType = ValueStorageType.Ntext,
+        };
+
+        dataType.ConfigurationData = new Dictionary<string, object>
+        {
+            ["minNumber"] = 0,
+            ["maxNumber"] = 10,
+            ["showOpenButton"] = false,
+            ["filter"] = DocumentTypes.NewsTag,
+            ["ignoreUserStartNodes"] = false,
+        };
+
+        await _dataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        _logger.LogInformation("PredelNews: Created Article Tags Picker data type");
     }
 }

@@ -22,6 +22,7 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
     private IDataType _textarea = null!;
     private IDataType _richtext = null!;
     private IDataType _articleRichtext = null!;
+    private IDataType _articleTagsPicker = null!;
     private IDataType _mediaPicker = null!;
     private IDataType _contentPicker = null!;
     private IDataType _trueFalse = null!;
@@ -120,6 +121,10 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         // Use custom Article Body RTE if available, fall back to default RTE
         _articleRichtext = allDataTypes
             .FirstOrDefault(d => d.Key == TinyMceConfigSetup.ArticleRteKey) ?? _richtext;
+
+        // Use custom Article Tags Picker if available, fall back to default Content Picker
+        _articleTagsPicker = allDataTypes
+            .FirstOrDefault(d => d.Key == TinyMceConfigSetup.ArticleTagsPickerKey) ?? _contentPicker;
     }
 
     private async Task<IContentType> EnsureCompositionAsync(string alias, string name,
@@ -200,7 +205,7 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _textstring, PropertyAliases.FullName) { Name = "Full Name", Mandatory = true }, "Content", "Content");
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _textarea, PropertyAliases.Bio) { Name = "Bio" }, "Content", "Content");
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _mediaPicker, PropertyAliases.Photo) { Name = "Photo" }, "Content", "Content");
-        ct.AddPropertyType(new PropertyType(_shortStringHelper, _emailAddress, PropertyAliases.Email) { Name = "Email" }, "Content", "Content");
+        ct.AddPropertyType(new PropertyType(_shortStringHelper, _emailAddress, PropertyAliases.Email) { Name = "Email" }, "Internal", "Internal");
 
         await _contentTypeService.SaveAsync(ct, SuperUserKey);
         _logger.LogInformation("Created author type");
@@ -229,7 +234,7 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
 
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _contentPicker, PropertyAliases.Category) { Name = "Category", Mandatory = true }, "Taxonomy", "Taxonomy");
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _contentPicker, PropertyAliases.Region) { Name = "Region" }, "Taxonomy", "Taxonomy");
-        ct.AddPropertyType(new PropertyType(_shortStringHelper, _contentPicker, PropertyAliases.Tags) { Name = "Tags" }, "Taxonomy", "Taxonomy");
+        ct.AddPropertyType(new PropertyType(_shortStringHelper, _articleTagsPicker, PropertyAliases.Tags) { Name = "Tags" }, "Taxonomy", "Taxonomy");
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _contentPicker, PropertyAliases.Author) { Name = "Author", Mandatory = true }, "Taxonomy", "Taxonomy");
 
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _dateTime, PropertyAliases.PublishDate) { Name = "Publish Date", Mandatory = true }, "Settings", "Settings");
@@ -286,6 +291,7 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _textstring, PropertyAliases.FooterCopyrightText) { Name = "Footer Copyright Text" }, "General", "General");
 
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _textstring, PropertyAliases.FacebookUrl) { Name = "Facebook URL" }, "Social", "Social");
+        ct.AddPropertyType(new PropertyType(_shortStringHelper, _textstring, PropertyAliases.InstagramUrl) { Name = "Instagram URL" }, "Social", "Social");
 
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _textstring, PropertyAliases.AdsensePublisherId) { Name = "AdSense Publisher ID" }, "Analytics & Ads", "Analytics & Ads");
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _textarea, PropertyAliases.AdsenseScriptTag) { Name = "AdSense Script Tag" }, "Analytics & Ads", "Analytics & Ads");
@@ -293,6 +299,9 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
 
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _textarea, PropertyAliases.DefaultSeoDescription) { Name = "Default SEO Description" }, "SEO", "SEO");
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _mediaPicker, PropertyAliases.DefaultOgImage) { Name = "Default OG Image" }, "SEO", "SEO");
+
+        ct.AddPropertyType(new PropertyType(_shortStringHelper, _textarea, PropertyAliases.BannedWordsList) { Name = "Banned Words List" }, "Moderation", "Moderation");
+        ct.AddPropertyType(new PropertyType(_shortStringHelper, _trueFalse, PropertyAliases.MaintenanceMode) { Name = "Maintenance Mode" }, "Moderation", "Moderation");
 
         await _contentTypeService.SaveAsync(ct, SuperUserKey);
         _logger.LogInformation("Created site settings type");

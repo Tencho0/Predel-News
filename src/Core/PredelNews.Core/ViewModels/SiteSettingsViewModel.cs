@@ -10,7 +10,10 @@ public class SiteSettingsViewModel
     public string? AdsenseScriptTag { get; set; }
     public string? Ga4MeasurementId { get; set; }
     public string? FacebookUrl { get; set; }
+    public string? InstagramUrl { get; set; }
     public string? DefaultSeoDescription { get; set; }
     public string? DefaultOgImageUrl { get; set; }
     public string? FooterCopyrightText { get; set; }
+    public string? BannedWordsList { get; set; }
+    public bool MaintenanceMode { get; set; }
 }
