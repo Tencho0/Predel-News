@@ -3,22 +3,34 @@
     var seoDescription = ViewBag.SeoDescription as string;
     var ogImageUrl = ViewBag.OgImageUrl as string;
     var canonicalUrl = ViewBag.CanonicalUrl as string;
+    var publishedTime = ViewBag.PublishedTime as string;
+    var modifiedTime = ViewBag.ModifiedTime as string;
 }
 
 @if (!string.IsNullOrEmpty(seoDescription))
 {
     <meta name="description" content="@seoDescription">
     <meta property="og:description" content="@seoDescription">
+    <meta name="twitter:description" content="@seoDescription">
 }
 
 @if (!string.IsNullOrEmpty(seoTitle))
 {
     <meta property="og:title" content="@seoTitle">
+    <meta name="twitter:title" content="@seoTitle">
 }
 
 @if (!string.IsNullOrEmpty(ogImageUrl))
 {
     <meta property="og:image" content="@ogImageUrl">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:image" content="@ogImageUrl">
+    <meta name="twitter:card" content="summary_large_image">
+}
+else
+{
+    <meta name="twitter:card" content="summary">
 }
 
 @if (!string.IsNullOrEmpty(canonicalUrl))
@@ -27,5 +39,16 @@
     <meta property="og:url" content="@canonicalUrl">
 }
 
+@if (!string.IsNullOrEmpty(publishedTime))
+{
+    <meta property="article:published_time" content="@publishedTime">
+}
+
+@if (!string.IsNullOrEmpty(modifiedTime))
+{
+    <meta property="article:modified_time" content="@modifiedTime">
+}
+
 <meta property="og:type" content="website">
 <meta property="og:locale" content="bg_BG">
+<meta property="og:site_name" content="PredelNews">

@@ -56,14 +56,15 @@ public class ContentTreeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         await PublishAsync(home);
 
         // Create children under home page
+        // Use Latin names for clean URL segments (Umbraco auto-generates segments from names)
         var children = new (string alias, string name)[]
         {
-            (DocumentTypes.NewsRoot, "Новини"),
-            (DocumentTypes.CategoryRoot, "Категории"),
-            (DocumentTypes.RegionRoot, "Региони"),
-            (DocumentTypes.TagRoot, "Тагове"),
-            (DocumentTypes.AuthorRoot, "Автори"),
-            (DocumentTypes.AllNewsPage, "Всички новини"),
+            (DocumentTypes.NewsRoot, "novini"),
+            (DocumentTypes.CategoryRoot, "kategoriya"),
+            (DocumentTypes.RegionRoot, "region"),
+            (DocumentTypes.TagRoot, "tag"),
+            (DocumentTypes.AuthorRoot, "avtor"),
+            (DocumentTypes.AllNewsPage, "vsichki-novini"),
         };
 
         foreach (var (alias, name) in children)
@@ -76,23 +77,30 @@ public class ContentTreeSetup : INotificationAsyncHandler<UmbracoApplicationStar
             await PublishAsync(node);
         }
 
-        // Static pages
-        foreach (var name in new[] { "За нас", "Реклама", "Рекламна оферта" })
+        // Static pages — use Latin names for URL segments, set Bulgarian display title via property
+        var staticPages = new (string urlName, string displayTitle)[]
         {
-            var node = _contentService.Create(name, home.Id, DocumentTypes.StaticPage);
-            node.SetValue(PropertyAliases.PageTitle, name);
+            ("za-nas", "За нас"),
+            ("reklama", "Реклама"),
+            ("reklamna-oferta", "Рекламна оферта"),
+        };
+
+        foreach (var (urlName, displayTitle) in staticPages)
+        {
+            var node = _contentService.Create(urlName, home.Id, DocumentTypes.StaticPage);
+            node.SetValue(PropertyAliases.PageTitle, displayTitle);
             _contentService.Save(node);
             await PublishAsync(node);
         }
 
         // Contact page
-        var contactPage = _contentService.Create("Контакти", home.Id, DocumentTypes.ContactPage);
+        var contactPage = _contentService.Create("kontakti", home.Id, DocumentTypes.ContactPage);
         contactPage.SetValue(PropertyAliases.PageTitle, "Контакти");
         _contentService.Save(contactPage);
         await PublishAsync(contactPage);
 
         // Privacy policy
-        var privacyPage = _contentService.Create("Политика за поверителност", home.Id, DocumentTypes.StaticPage);
+        var privacyPage = _contentService.Create("politika-za-poveritelnost", home.Id, DocumentTypes.StaticPage);
         privacyPage.SetValue(PropertyAliases.PageTitle, "Политика за поверителност");
         _contentService.Save(privacyPage);
         await PublishAsync(privacyPage);

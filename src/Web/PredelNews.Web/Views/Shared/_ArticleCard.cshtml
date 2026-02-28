@@ -1,0 +1,96 @@
+@model PredelNews.Core.ViewModels.ArticleSummaryViewModel
+@{
+    var variant = ViewData["Variant"] as string ?? "vertical";
+    var isHorizontal = variant == "horizontal";
+}
+
+@if (isHorizontal)
+{
+    <article class="pn-card pn-card-horizontal @(Model.IsSponsored ? "pn-card-sponsored" : "")">
+        @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+        {
+            <img src="@Model.CoverImageUrl" class="pn-card-thumb" alt="@(Model.CoverImageAlt ?? Model.Headline)">
+        }
+        <div class="card-body p-3">
+            <div class="d-flex flex-wrap gap-1 mb-1">
+                @if (Model.IsSponsored)
+                {
+                    <span class="badge pn-badge-sponsored">Платена</span>
+                }
+                @if (Model.IsBreakingNews)
+                {
+                    <span class="badge pn-badge-breaking">Спешно</span>
+                }
+                @if (!string.IsNullOrEmpty(Model.CategoryName))
+                {
+                    <span class="badge pn-badge-category">@Model.CategoryName</span>
+                }
+                @if (!string.IsNullOrEmpty(Model.RegionName))
+                {
+                    <span class="badge pn-badge-region">@Model.RegionName</span>
+                }
+            </div>
+            <h5 class="card-title mb-1"><a href="@Model.ArticleUrl">@Model.Headline</a></h5>
+            @if (!string.IsNullOrEmpty(Model.Subtitle))
+            {
+                <p class="pn-card-subtitle mb-1">@Model.Subtitle</p>
+            }
+            <div class="pn-card-meta">
+                @if (!Model.IsSponsored && !string.IsNullOrEmpty(Model.AuthorName))
+                {
+                    @Model.AuthorName<text> &middot; </text>
+                }
+                <time datetime="@Model.PublishDate.ToString("yyyy-MM-dd")">@Model.PublishDate.ToString("dd MMM yyyy")</time>
+                @if (Model.CommentCount > 0)
+                {
+                    <text> &middot; <i class="bi bi-chat-dots"></i> @Model.CommentCount</text>
+                }
+            </div>
+        </div>
+    </article>
+}
+else
+{
+    <article class="pn-card @(Model.IsSponsored ? "pn-card-sponsored" : "") @(ViewData["Featured"] != null ? "pn-card-featured" : "")">
+        @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+        {
+            <img src="@Model.CoverImageUrl" class="card-img-top" alt="@(Model.CoverImageAlt ?? Model.Headline)">
+        }
+        <div class="card-body p-3 @(ViewData["Featured"] != null ? "p-md-4" : "")">
+            <div class="d-flex flex-wrap gap-2 mb-2">
+                @if (Model.IsSponsored)
+                {
+                    <span class="badge pn-badge-sponsored">Платена</span>
+                }
+                @if (Model.IsBreakingNews)
+                {
+                    <span class="badge pn-badge-breaking">Спешно</span>
+                }
+                @if (!string.IsNullOrEmpty(Model.CategoryName))
+                {
+                    <span class="badge pn-badge-category">@Model.CategoryName</span>
+                }
+                @if (!string.IsNullOrEmpty(Model.RegionName))
+                {
+                    <span class="badge pn-badge-region">@Model.RegionName</span>
+                }
+            </div>
+            <h3 class="card-title"><a href="@Model.ArticleUrl">@Model.Headline</a></h3>
+            @if (!string.IsNullOrEmpty(Model.Subtitle))
+            {
+                <p class="pn-card-subtitle">@Model.Subtitle</p>
+            }
+            <div class="pn-card-meta d-flex gap-2">
+                @if (!Model.IsSponsored && !string.IsNullOrEmpty(Model.AuthorName))
+                {
+                    <span>@Model.AuthorName</span><span>&middot;</span>
+                }
+                <time datetime="@Model.PublishDate.ToString("yyyy-MM-dd")">@Model.PublishDate.ToString("dd MMMM yyyy")</time>
+                @if (Model.CommentCount > 0)
+                {
+                    <span>&middot;</span><span><i class="bi bi-chat-dots"></i> @Model.CommentCount</span>
+                }
+            </div>
+        </div>
+    </article>
+}

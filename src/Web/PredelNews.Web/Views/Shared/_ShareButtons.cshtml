@@ -1,0 +1,18 @@
+@{
+    var shareUrl = ViewData["ShareUrl"] as string ?? "";
+}
+
+<div class="d-flex align-items-center gap-2 py-3 border-top border-bottom">
+    <span class="small fw-semibold text-meta me-1">Сподели:</span>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=@Uri.EscapeDataString(shareUrl)"
+       class="pn-share-btn" target="_blank" rel="noopener" aria-label="Facebook">
+        <i class="bi bi-facebook"></i>
+    </a>
+    <a href="viber://forward?text=@Uri.EscapeDataString(shareUrl)"
+       class="pn-share-btn" aria-label="Viber">
+        <i class="bi bi-phone"></i>
+    </a>
+    <button class="pn-share-btn" data-copy-url="@shareUrl" aria-label="Копирай линк">
+        <i class="bi bi-link-45deg"></i>
+    </button>
+</div>

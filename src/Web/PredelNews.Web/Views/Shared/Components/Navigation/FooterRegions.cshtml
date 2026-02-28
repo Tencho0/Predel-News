@@ -1,0 +1,8 @@
+@model PredelNews.Core.ViewModels.NavigationViewModel
+
+<ul class="list-unstyled d-flex flex-column gap-2 small">
+  @foreach (var reg in Model.Regions)
+  {
+    <li><a href="@reg.Url">@reg.Name</a></li>
+  }
+</ul>

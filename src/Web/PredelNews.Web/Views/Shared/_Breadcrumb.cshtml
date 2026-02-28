@@ -1,0 +1,40 @@
+@model List<PredelNews.Core.ViewModels.BreadcrumbItem>
+
+<nav aria-label="Навигационна пътека">
+    <ol class="breadcrumb small">
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            var item = Model[i];
+            var isLast = i == Model.Count - 1;
+            if (isLast)
+            {
+                <li class="breadcrumb-item active" aria-current="page">@item.Name</li>
+            }
+            else
+            {
+                <li class="breadcrumb-item"><a href="@item.Url">@item.Name</a></li>
+            }
+        }
+    </ol>
+</nav>
+
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            var item = Model[i];
+            <text>
+            {
+                "@@type": "ListItem",
+                "position": @(i + 1),
+                "name": "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(item.Name))"@if (item.Url != null){<text>,
+                "item": "@Html.Raw(item.Url)"</text>}
+            }@(i < Model.Count - 1 ? "," : "")
+            </text>
+        }
+    ]
+}
+</script>

@@ -1,0 +1,25 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@model PredelNews.Core.ViewModels.StaticPageViewModel
+
+<section class="py-5">
+  <div class="container">
+    @await Html.PartialAsync("_Breadcrumb", Model.Breadcrumbs)
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <h1 class="mb-4">@Model.PageTitle</h1>
+        <div class="pn-article-body">
+          @Html.Raw(Model.Body)
+        </div>
+        @if (!string.IsNullOrEmpty(Model.MediaKitPdfUrl))
+        {
+          <div class="mt-4">
+            <a href="@Model.MediaKitPdfUrl" class="btn btn-primary" download>
+              <i class="bi bi-download me-2"></i>Изтегли медиен кит (PDF)
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>

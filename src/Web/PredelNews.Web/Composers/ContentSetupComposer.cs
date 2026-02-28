@@ -14,6 +14,7 @@ public class ContentSetupComposer : IComposer
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, TinyMceConfigSetup>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, ContentTypeSetup>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, ContentTreeSetup>();
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, TemplateSetup>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, TaxonomySeedSetup>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, UserGroupSetup>();
         builder.AddNotificationAsyncHandler<ContentSavingNotification, SponsoredContentGuardHandler>();

@@ -35,6 +35,7 @@ try
     builder.Services.AddPredelNewsInfrastructure(builder.Configuration);
     builder.Services.AddPredelNewsBackofficeExtensions();
     builder.Services.AddScoped<ISiteSettingsService, SiteSettingsService>();
+    builder.Services.AddScoped<ContentMapperService>();
 
     builder.CreateUmbracoBuilder()
         .AddBackOffice()
@@ -47,6 +48,7 @@ try
     await app.BootUmbracoAsync();
 
     app.UseSerilogRequestLogging();
+    app.UseStatusCodePagesWithReExecute("/error/{0}");
     app.UseHttpsRedirection();
 
     app.UseUmbraco()

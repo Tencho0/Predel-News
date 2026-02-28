@@ -11,7 +11,10 @@ public class ArticleSummaryViewModel
     public string? CategoryName { get; set; }
     public string? CategorySlug { get; set; }
     public string? RegionName { get; set; }
+    public string? RegionSlug { get; set; }
     public string? AuthorName { get; set; }
+    public string ArticleUrl { get; set; } = string.Empty;
+    public string? AuthorUrl { get; set; }
     public DateTime PublishDate { get; set; }
     public bool IsBreakingNews { get; set; }
     public bool IsSponsored { get; set; }

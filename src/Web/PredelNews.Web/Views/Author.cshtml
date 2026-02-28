@@ -1,0 +1,48 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@model PredelNews.Core.ViewModels.ArchivePageViewModel
+
+<div class="container my-3"><div class="pn-ad-slot pn-ad-leaderboard"><span>728 &times; 90</span></div></div>
+
+<section class="py-4">
+  <div class="container">
+    @await Html.PartialAsync("_Breadcrumb", Model.Breadcrumbs)
+
+    <!-- Author info header -->
+    <div class="d-flex align-items-center gap-3 mb-4 pb-4 border-bottom">
+      @if (!string.IsNullOrEmpty(Model.AuthorPhotoUrl))
+      {
+        <img src="@Model.AuthorPhotoUrl" alt="@Model.AuthorName" class="rounded-circle" width="80" height="80" style="object-fit:cover">
+      }
+      <div>
+        <h1 class="pn-section-title mb-1">@Model.ArchiveTitle</h1>
+        @if (!string.IsNullOrEmpty(Model.AuthorBio))
+        {
+          <p class="text-meta mb-0">@Model.AuthorBio</p>
+        }
+        <span class="small text-meta">@Model.TotalArticleCount публикации</span>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="d-flex flex-column gap-3">
+          @foreach (var article in Model.Articles)
+          {
+            @await Html.PartialAsync("_ArticleCard", article, new ViewDataDictionary(ViewData) { { "Variant", "horizontal" } })
+          }
+        </div>
+        @await Html.PartialAsync("_Pagination", Model.Pagination)
+      </div>
+
+      <aside class="col-lg-4">
+        <div class="pn-ad-slot pn-ad-sidebar mb-4"><span>300 &times; 250</span></div>
+        <div class="pn-widget p-3 mb-4">
+          <h3 class="pn-widget-title mb-3">Най-четено</h3>
+          <ol class="pn-most-read">
+            <li><a href="#">Очаквайте скоро</a></li>
+          </ol>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>

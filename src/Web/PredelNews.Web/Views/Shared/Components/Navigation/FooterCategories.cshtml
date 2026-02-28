@@ -1,0 +1,8 @@
+@model PredelNews.Core.ViewModels.NavigationViewModel
+
+<ul class="list-unstyled d-flex flex-column gap-2 small">
+  @foreach (var cat in Model.Categories)
+  {
+    <li><a href="@cat.Url">@cat.Name</a></li>
+  }
+</ul>

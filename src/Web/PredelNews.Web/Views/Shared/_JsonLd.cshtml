@@ -1,0 +1,45 @@
+@model PredelNews.Core.ViewModels.ArticleDetailViewModel
+
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "NewsArticle",
+    "headline": "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Model.Headline))",
+    "datePublished": "@Model.PublishDate.ToString("yyyy-MM-ddTHH:mm:sszzz")",
+    @if (Model.UpdatedDate.HasValue)
+    {
+        <text>"dateModified": "@Model.UpdatedDate.Value.ToString("yyyy-MM-ddTHH:mm:sszzz")",</text>
+    }
+    @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+    {
+        <text>"image": "@Html.Raw(Model.CoverImageUrl)",</text>
+    }
+    @if (!string.IsNullOrEmpty(Model.AuthorName))
+    {
+        <text>"author": {
+        "@@type": "Person",
+        "name": "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Model.AuthorName))"
+        @if (!string.IsNullOrEmpty(Model.AuthorUrl))
+        {
+            <text>,"url": "@Html.Raw(Model.AuthorUrl)"</text>
+        }
+    },</text>
+    }
+    @if (Model.IsSponsored && !string.IsNullOrEmpty(Model.SponsorName))
+    {
+        <text>"sponsor": {
+        "@@type": "Organization",
+        "name": "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Model.SponsorName))"
+    },</text>
+    }
+    "publisher": {
+        "@@type": "NewsMediaOrganization",
+        "name": "PredelNews",
+        "url": "https://predelnews.bg"
+    },
+    "mainEntityOfPage": {
+        "@@type": "WebPage",
+        "@@id": "@Html.Raw(Model.ShareUrl)"
+    }
+}
+</script>

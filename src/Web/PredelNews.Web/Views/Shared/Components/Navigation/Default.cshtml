@@ -1,0 +1,31 @@
+@model PredelNews.Core.ViewModels.NavigationViewModel
+
+<ul class="navbar-nav gap-4">
+  <li class="nav-item"><a class="nav-link" href="/">Начало</a></li>
+  <li class="nav-item"><a class="nav-link" href="/vsichki-novini">Новини</a></li>
+  @if (Model.Categories.Count > 0)
+  {
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Категории</a>
+      <ul class="dropdown-menu">
+        @foreach (var cat in Model.Categories)
+        {
+          <li><a class="dropdown-item" href="@cat.Url">@cat.Name</a></li>
+        }
+      </ul>
+    </li>
+  }
+  @if (Model.Regions.Count > 0)
+  {
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Региони</a>
+      <ul class="dropdown-menu">
+        @foreach (var reg in Model.Regions)
+        {
+          <li><a class="dropdown-item" href="@reg.Url">@reg.Name</a></li>
+        }
+      </ul>
+    </li>
+  }
+  <li class="nav-item"><a class="nav-link" href="/kontakti">Контакт</a></li>
+</ul>

@@ -1,0 +1,77 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@model PredelNews.Core.ViewModels.ContactPageViewModel
+
+<section class="py-5 bg-surface">
+  <div class="container">
+    @await Html.PartialAsync("_Breadcrumb", Model.Breadcrumbs)
+
+    <h1 class="mb-4">@Model.PageTitle</h1>
+    @if (!string.IsNullOrEmpty(Model.IntroText))
+    {
+      <p class="text-meta mb-4">@Model.IntroText</p>
+    }
+    <div class="row g-5">
+      <div class="col-lg-7">
+        <div class="bg-white rounded p-4 shadow-sm">
+          <!-- Contact form — submission logic deferred to EPIC-07 -->
+          <form>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold" for="c-name">Вашето име *</label>
+              <input type="text" class="form-control" id="c-name" name="name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold" for="c-email">Имейл *</label>
+              <input type="email" class="form-control" id="c-email" name="email" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold" for="c-subject">Тема</label>
+              <select class="form-select" id="c-subject" name="subject">
+                <option value="">Изберете тема</option>
+                <option>Новинарски сигнал</option>
+                <option>Реклама и партньорства</option>
+                <option>Техническа поддръжка</option>
+                <option>Друго</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold" for="c-message">Съобщение *</label>
+              <textarea class="form-control" id="c-message" name="message" rows="5" required placeholder="Напишете вашето съобщение..."></textarea>
+            </div>
+            <div class="pn-hp" aria-hidden="true">
+              <input type="text" name="fax" tabindex="-1" autocomplete="off">
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-send me-2"></i>Изпрати
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="bg-white rounded p-4 shadow-sm">
+          <h3 class="font-heading fw-bold mb-4">Информация</h3>
+          @if (!string.IsNullOrEmpty(Model.DisplayEmail))
+          {
+            <div class="d-flex gap-3 mb-4">
+              <i class="bi bi-envelope fs-4" style="color:var(--pn-primary)"></i>
+              <div>
+                <div class="small fw-semibold">Имейл</div>
+                <div class="small text-meta">@Model.DisplayEmail</div>
+              </div>
+            </div>
+          }
+          @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+          {
+            <div class="d-flex gap-3 mb-4">
+              <i class="bi bi-telephone fs-4" style="color:var(--pn-primary)"></i>
+              <div>
+                <div class="small fw-semibold">Телефон</div>
+                <div class="small text-meta">@Model.PhoneNumber</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
