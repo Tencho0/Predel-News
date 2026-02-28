@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light only">
+  <title>@ViewBag.Title | PredelNews</title>
+  @await Html.PartialAsync("_SeoMeta")
+  <link rel="icon" href="~/images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="~/css/site.css?v=1.0.0">
+</head>
+<body>
+  <a href="#main-content" class="skip-to-content">Прескочи към съдържанието</a>
+  <header>
+    <nav aria-label="Основна навигация">
+      <div class="container">
+        <a href="/" aria-label="PredelNews начало">
+          <img src="~/images/logo-placeholder.svg" alt="PredelNews" width="200" height="50">
+        </a>
+        <button data-nav-toggle aria-expanded="false" aria-controls="main-nav" aria-label="Меню">
+          &#9776;
+        </button>
+        <ul id="main-nav" data-nav-menu hidden>
+          <li><a href="/">Начало</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+  <main id="main-content">
+    @RenderBody()
+  </main>
+  <footer>
+    <div class="container">
+      <p>&copy; @DateTime.Now.Year PredelNews. Всички права запазени.</p>
+    </div>
+  </footer>
+  <script src="~/js/nav.js?v=1.0.0" defer></script>
+  @RenderSection("Scripts", required: false)
+</body>
+</html>

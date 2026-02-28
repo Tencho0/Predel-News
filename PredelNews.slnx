@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/BackofficeExtensions/">
+    <Project Path="src/BackofficeExtensions/PredelNews.BackofficeExtensions/PredelNews.BackofficeExtensions.csproj" />
+  </Folder>
+  <Folder Name="/src/Core/">
+    <Project Path="src/Core/PredelNews.Core.Tests/PredelNews.Core.Tests.csproj" />
+    <Project Path="src/Core/PredelNews.Core/PredelNews.Core.csproj" />
+  </Folder>
+  <Folder Name="/src/Infrastructure/">
+    <Project Path="src/Infrastructure/PredelNews.Infrastructure/PredelNews.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Web/">
+    <Project Path="src/Web/PredelNews.Web/PredelNews.Web.csproj" />
+  </Folder>
+</Solution>

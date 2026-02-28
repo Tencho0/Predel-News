@@ -1,0 +1,31 @@
+@{
+    var seoTitle = ViewBag.SeoTitle as string;
+    var seoDescription = ViewBag.SeoDescription as string;
+    var ogImageUrl = ViewBag.OgImageUrl as string;
+    var canonicalUrl = ViewBag.CanonicalUrl as string;
+}
+
+@if (!string.IsNullOrEmpty(seoDescription))
+{
+    <meta name="description" content="@seoDescription">
+    <meta property="og:description" content="@seoDescription">
+}
+
+@if (!string.IsNullOrEmpty(seoTitle))
+{
+    <meta property="og:title" content="@seoTitle">
+}
+
+@if (!string.IsNullOrEmpty(ogImageUrl))
+{
+    <meta property="og:image" content="@ogImageUrl">
+}
+
+@if (!string.IsNullOrEmpty(canonicalUrl))
+{
+    <link rel="canonical" href="@canonicalUrl">
+    <meta property="og:url" content="@canonicalUrl">
+}
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="bg_BG">
