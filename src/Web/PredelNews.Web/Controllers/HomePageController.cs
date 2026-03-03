@@ -113,6 +113,8 @@ public class HomePageController : RenderController
             allArticles.Skip((page - 1) * pageSize).Take(pageSize));
 
         ViewBag.Title = model.PageTitle;
+        ViewBag.SeoTitle = model.SeoTitle ?? model.PageTitle;
+        ViewBag.SeoDescription = model.SeoDescription;
         return CurrentTemplate(model);
     }
 

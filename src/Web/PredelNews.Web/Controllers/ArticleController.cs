@@ -96,6 +96,13 @@ public class ArticleController : RenderController
         }
 
         ViewBag.Title = model.PageTitle;
+        ViewBag.SeoTitle = model.SeoTitle ?? model.Headline;
+        ViewBag.SeoDescription = model.SeoDescription;
+        ViewBag.OgImageUrl = model.OgImageUrl;
+        ViewBag.CanonicalUrl = model.CanonicalUrl;
+        ViewBag.PublishedTime = model.PublishDate.ToString("yyyy-MM-ddTHH:mm:sszzz");
+        if (model.UpdatedDate.HasValue)
+            ViewBag.ModifiedTime = model.UpdatedDate.Value.ToString("yyyy-MM-ddTHH:mm:sszzz");
         return CurrentTemplate(model);
     }
 

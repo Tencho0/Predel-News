@@ -109,14 +109,15 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
             allDataTypes.FirstOrDefault(d => d.EditorAlias == editorAlias)
             ?? throw new InvalidOperationException($"Data type with editor alias '{editorAlias}' not found");
 
-        _textstring = Find("Umbraco.Plain.String");
+        _textstring = Find("Umbraco.TextBox");
         _textarea = Find("Umbraco.TextArea");
         _richtext = Find("Umbraco.RichText");
         _mediaPicker = Find("Umbraco.MediaPicker3");
         _contentPicker = Find("Umbraco.ContentPicker");
         _trueFalse = Find("Umbraco.TrueFalse");
         _dateTime = Find("Umbraco.DateTime");
-        _emailAddress = Find("Umbraco.EmailAddress");
+        // Umbraco 17 does not seed a default EmailAddress data type instance; fall back to TextBox
+        _emailAddress = allDataTypes.FirstOrDefault(d => d.EditorAlias == "Umbraco.EmailAddress") ?? _textstring;
 
         // Use custom Article Body RTE if available, fall back to default RTE
         _articleRichtext = allDataTypes

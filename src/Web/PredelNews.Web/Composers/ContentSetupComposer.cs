@@ -10,11 +10,11 @@ public class ContentSetupComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
-        // Data type setup must run before content type setup
+        // Data type and template setup must run before content tree setup
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, TinyMceConfigSetup>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, ContentTypeSetup>();
-        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, ContentTreeSetup>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, TemplateSetup>();
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, ContentTreeSetup>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, TaxonomySeedSetup>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, UserGroupSetup>();
         builder.AddNotificationAsyncHandler<ContentSavingNotification, SponsoredContentGuardHandler>();

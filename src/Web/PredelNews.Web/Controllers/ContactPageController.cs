@@ -39,6 +39,8 @@ public class ContactPageController : RenderController
         };
 
         ViewBag.Title = model.PageTitle;
+        ViewBag.SeoTitle = model.SeoTitle ?? model.PageTitle;
+        ViewBag.SeoDescription = model.SeoDescription;
         return CurrentTemplate(model);
     }
 }

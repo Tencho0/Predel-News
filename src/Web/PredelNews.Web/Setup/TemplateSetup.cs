@@ -45,6 +45,11 @@ public class TemplateSetup : INotificationAsyncHandler<UmbracoApplicationStarted
             ("AllNewsPage", "All News Page", DocumentTypes.AllNewsPage),
             ("StaticPage", "Static Page", DocumentTypes.StaticPage),
             ("ContactPage", "Contact Page", DocumentTypes.ContactPage),
+            ("NewsRoot", "News Root", DocumentTypes.NewsRoot),
+            ("CategoryRoot", "Category Root", DocumentTypes.CategoryRoot),
+            ("RegionRoot", "Region Root", DocumentTypes.RegionRoot),
+            ("TagRoot", "Tag Root", DocumentTypes.TagRoot),
+            ("AuthorRoot", "Author Root", DocumentTypes.AuthorRoot),
         };
 
         foreach (var (alias, name, docTypeAlias) in templateMappings)
@@ -71,15 +76,19 @@ public class TemplateSetup : INotificationAsyncHandler<UmbracoApplicationStarted
         var contentType = _contentTypeService.Get(docTypeAlias);
         if (contentType == null) return;
 
-        if (contentType.DefaultTemplate?.Alias != alias)
+        // Only call SaveAsync when the template is not yet assigned.
+        // Calling SaveAsync unconditionally causes a deadlock on every boot:
+        // SaveAsync holds WriteLock -332, then ContentTypeCacheRefresher calls
+        // RebuildMemoryCacheByContentTypeAsync which tries ReadLock -332 → deadlock.
+        // Stale NuCache from prior runs is fixed by republishing content in ContentTreeSetup.
+        if (contentType.DefaultTemplate?.Alias == alias) return;
+
+        contentType.SetDefaultTemplate(existing);
+        if (!contentType.AllowedTemplates.Any(t => t.Alias == alias))
         {
-            contentType.SetDefaultTemplate(existing);
-            if (!contentType.AllowedTemplates.Any(t => t.Alias == alias))
-            {
-                contentType.AllowedTemplates = contentType.AllowedTemplates.Append(existing);
-            }
-            await _contentTypeService.SaveAsync(contentType, SuperUserKey);
-            _logger.LogInformation("Assigned template {Alias} to doc type {DocType}", alias, docTypeAlias);
+            contentType.AllowedTemplates = contentType.AllowedTemplates.Append(existing);
         }
+        await _contentTypeService.SaveAsync(contentType, SuperUserKey);
+        _logger.LogInformation("Assigned template {Alias} to doc type {DocType}", alias, docTypeAlias);
     }
 }
