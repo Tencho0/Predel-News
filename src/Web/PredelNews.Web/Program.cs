@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 using PredelNews.BackofficeExtensions.Extensions;
 using PredelNews.Core.Extensions;
 using PredelNews.Core.Services;
@@ -37,6 +40,36 @@ try
     builder.Services.AddScoped<ISiteSettingsService, SiteSettingsService>();
     builder.Services.AddScoped<ContentMapperService>();
 
+    builder.Services.AddAntiforgery(options =>
+    {
+        options.HeaderName = "X-CSRF-TOKEN";
+        options.FormFieldName = "__RequestVerificationToken";
+    });
+
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.AddPolicy("CommentRateLimit", context =>
+            RateLimitPartition.GetSlidingWindowLimiter(
+                partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                factory: _ => new SlidingWindowRateLimiterOptions
+                {
+                    Window = TimeSpan.FromMinutes(5),
+                    SegmentsPerWindow = 5,
+                    PermitLimit = 3
+                }));
+        options.OnRejected = async (context, cancellationToken) =>
+        {
+            context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            context.HttpContext.Response.ContentType = "application/json";
+            var body = JsonSerializer.Serialize(new
+            {
+                status = "rate_limited",
+                message = "Моля, изчакайте няколко минути преди да публикувате нов коментар."
+            });
+            await context.HttpContext.Response.WriteAsync(body, cancellationToken);
+        };
+    });
+
     builder.CreateUmbracoBuilder()
         .AddBackOffice()
         .AddWebsite()
@@ -50,6 +83,7 @@ try
     app.UseSerilogRequestLogging();
     app.UseStatusCodePagesWithReExecute("/error/{0}");
     app.UseHttpsRedirection();
+    app.UseRateLimiter();
 
     app.UseUmbraco()
         .WithMiddleware(u =>

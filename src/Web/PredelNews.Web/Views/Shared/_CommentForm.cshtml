@@ -1,0 +1,47 @@
+@model PredelNews.Core.ViewModels.CommentFormViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
+    var tokenSet = Antiforgery.GetAndStoreTokens(Context);
+}
+
+<div id="comment-form-container" class="mt-4">
+  <h3 class="h5 mb-3">Оставете коментар</h3>
+
+  <div id="comment-message" class="alert d-none" role="alert"></div>
+
+  <form id="comment-form" action="/api/comments" method="post">
+    <input type="hidden" name="@tokenSet.FormFieldName" value="@tokenSet.RequestToken" />
+    <input type="hidden" name="articleId" value="@Model.ArticleId" />
+
+    <!-- Honeypot: hidden from real users -->
+    <input type="text" name="website" id="comment-website"
+           autocomplete="off"
+           style="position:absolute; left:-9999px; opacity:0; pointer-events:none;"
+           tabindex="-1"
+           aria-hidden="true">
+
+    <div class="mb-3">
+      <label for="displayName" class="form-label">Име <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" id="displayName" name="displayName"
+             maxlength="200" required
+             value="@Model.PrefillName"
+             placeholder="Вашето име">
+      <div class="invalid-feedback" id="displayName-error"></div>
+    </div>
+
+    <div class="mb-3">
+      <label for="commentText" class="form-label">Коментар <span class="text-danger">*</span></label>
+      <textarea class="form-control" id="commentText" name="commentText"
+                rows="4" maxlength="2000" required
+                placeholder="Вашият коментар..."></textarea>
+      <div class="invalid-feedback" id="commentText-error"></div>
+    </div>
+
+    <button type="submit" class="btn pn-btn-primary" id="comment-submit">
+      Публикувай
+    </button>
+  </form>
+</div>
+
+<script src="~/js/comments.js" defer></script>

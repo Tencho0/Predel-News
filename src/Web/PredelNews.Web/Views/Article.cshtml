@@ -112,12 +112,22 @@
           </section>
         }
 
-        <!-- Comments placeholder (EPIC-05) -->
-        <section class="mt-5" aria-label="Коментари">
+        <!-- Comments (EPIC-05) -->
+        <section id="comments" class="mt-5" aria-label="Коментари">
           <div class="pn-section-header d-flex justify-content-between align-items-center">
-            <h2 class="pn-section-title">Коментари</h2>
+            <h2 class="pn-section-title">Коментари (<span id="comment-count">@Model.CommentCount</span>)</h2>
           </div>
-          <p class="small text-meta">Коментарите ще бъдат активирани скоро.</p>
+          @await Html.PartialAsync("_CommentList", new PredelNews.Core.ViewModels.CommentListViewModel
+          {
+              Comments = Model.Comments,
+              CommentCount = Model.CommentCount,
+              CanModerate = User.IsInRole("Writer") || User.IsInRole("Editor") || User.IsInRole("Admin") || User.IsInRole("admin")
+          })
+          @await Html.PartialAsync("_CommentForm", new PredelNews.Core.ViewModels.CommentFormViewModel
+          {
+              ArticleId = Model.ArticleId,
+              PrefillName = Context.Request.Cookies["pn_comment_name"] ?? string.Empty
+          })
         </section>
       </article>
     </div>

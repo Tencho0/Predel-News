@@ -1,0 +1,24 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "PredelNews.HeldComments",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "dashboard",
+      "alias": "PredelNews.HeldComments.Dashboard",
+      "name": "Held Comments",
+      "element": "/App_Plugins/HeldComments/held-comments-dashboard.js",
+      "weight": 100,
+      "meta": {
+        "label": "Задържани коментари",
+        "pathname": "held-comments"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "Umb.Section.Content"
+        }
+      ]
+    }
+  ]
+}

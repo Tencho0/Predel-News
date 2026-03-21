@@ -1,4 +1,5 @@
 using PredelNews.Core.Constants;
+using PredelNews.Core.Services;
 using PredelNews.Core.ViewModels;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
@@ -7,6 +8,13 @@ namespace PredelNews.Web.Services;
 
 public class ContentMapperService
 {
+    private readonly ICommentService _commentService;
+
+    public ContentMapperService(ICommentService commentService)
+    {
+        _commentService = commentService;
+    }
+
     public ArticleSummaryViewModel MapArticleSummary(IPublishedContent article)
     {
         var category = article.Value<IPublishedContent>(PropertyAliases.Category);
@@ -38,6 +46,19 @@ public class ContentMapperService
 
     public List<ArticleSummaryViewModel> MapArticleSummaries(IEnumerable<IPublishedContent> articles)
     {
-        return articles.Select(MapArticleSummary).ToList();
+        var summaries = articles.Select(MapArticleSummary).ToList();
+
+        var articleIds = summaries.Select(s => s.Id).ToList();
+        if (articleIds.Count > 0)
+        {
+            var counts = _commentService.GetCommentCountsAsync(articleIds).GetAwaiter().GetResult();
+            foreach (var summary in summaries)
+            {
+                if (counts.TryGetValue(summary.Id, out var count))
+                    summary.CommentCount = count;
+            }
+        }
+
+        return summaries;
     }
 }

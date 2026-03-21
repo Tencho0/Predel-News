@@ -1,7 +1,10 @@
+using PredelNews.Core.Models;
+
 namespace PredelNews.Core.ViewModels;
 
 public class ArticleDetailViewModel : BasePageViewModel
 {
+    public int ArticleId { get; set; }
     public string Headline { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
     public string Body { get; set; } = string.Empty;
@@ -23,6 +26,7 @@ public class ArticleDetailViewModel : BasePageViewModel
     public string? SponsorName { get; set; }
     public string ShareUrl { get; set; } = string.Empty;
     public int CommentCount { get; set; }
+    public IReadOnlyList<CommentDto> Comments { get; set; } = [];
     public List<ArticleSummaryViewModel> RelatedArticles { get; set; } = [];
     public List<BreadcrumbItem> Breadcrumbs { get; set; } = [];
 }
