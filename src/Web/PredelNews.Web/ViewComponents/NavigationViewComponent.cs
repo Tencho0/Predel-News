@@ -50,6 +50,8 @@ public class NavigationViewComponent : ViewComponent
                 .ToList();
         }
 
+        model.CurrentPath = HttpContext.Request.Path.Value ?? "";
+
         return GetView(section, model);
     }
 

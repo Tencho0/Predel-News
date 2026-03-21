@@ -1,31 +1,68 @@
 @model PredelNews.Core.ViewModels.NavigationViewModel
 
+<div class="d-md-none mb-3 mt-2">
+  <form action="/tarsene" method="get" role="search">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Търсене на новини..."
+             autocomplete="off" aria-label="Търсене на новини">
+      <button type="submit" class="btn btn-outline-secondary">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </form>
+</div>
+
 <ul class="navbar-nav gap-4">
-  <li class="nav-item"><a class="nav-link" href="/">Начало</a></li>
-  <li class="nav-item"><a class="nav-link" href="/vsichki-novini">Новини</a></li>
+  @{
+    var currentPath = Model.CurrentPath;
+    var isHome = currentPath == "/" || currentPath == "";
+    var isNews = currentPath.StartsWith("/vsichki-novini", StringComparison.OrdinalIgnoreCase);
+    var isContact = currentPath.StartsWith("/kontakti", StringComparison.OrdinalIgnoreCase);
+  }
+  <li class="nav-item">
+    <a class="nav-link @(isHome ? "active" : "")" href="/"
+       @(isHome ? Html.Raw("aria-current=\"page\"") : null)>Начало</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link @(isNews ? "active" : "")" href="/vsichki-novini"
+       @(isNews ? Html.Raw("aria-current=\"page\"") : null)>Новини</a>
+  </li>
   @if (Model.Categories.Count > 0)
   {
+    var anyCategoryActive = Model.Categories.Any(c => currentPath.StartsWith(c.Url, StringComparison.OrdinalIgnoreCase));
     <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Категории</a>
+      <a class="nav-link dropdown-toggle @(anyCategoryActive ? "active" : "")" href="#" data-bs-toggle="dropdown">Категории</a>
       <ul class="dropdown-menu">
         @foreach (var cat in Model.Categories)
         {
-          <li><a class="dropdown-item" href="@cat.Url">@cat.Name</a></li>
+          var isCatActive = currentPath.StartsWith(cat.Url, StringComparison.OrdinalIgnoreCase);
+          <li>
+            <a class="dropdown-item @(isCatActive ? "active" : "")" href="@cat.Url"
+               @(isCatActive ? Html.Raw("aria-current=\"page\"") : null)>@cat.Name</a>
+          </li>
         }
       </ul>
     </li>
   }
   @if (Model.Regions.Count > 0)
   {
+    var anyRegionActive = Model.Regions.Any(r => currentPath.StartsWith(r.Url, StringComparison.OrdinalIgnoreCase));
     <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Региони</a>
+      <a class="nav-link dropdown-toggle @(anyRegionActive ? "active" : "")" href="#" data-bs-toggle="dropdown">Региони</a>
       <ul class="dropdown-menu">
         @foreach (var reg in Model.Regions)
         {
-          <li><a class="dropdown-item" href="@reg.Url">@reg.Name</a></li>
+          var isRegActive = currentPath.StartsWith(reg.Url, StringComparison.OrdinalIgnoreCase);
+          <li>
+            <a class="dropdown-item @(isRegActive ? "active" : "")" href="@reg.Url"
+               @(isRegActive ? Html.Raw("aria-current=\"page\"") : null)>@reg.Name</a>
+          </li>
         }
       </ul>
     </li>
   }
-  <li class="nav-item"><a class="nav-link" href="/kontakti">Контакт</a></li>
+  <li class="nav-item">
+    <a class="nav-link @(isContact ? "active" : "")" href="/kontakti"
+       @(isContact ? Html.Raw("aria-current=\"page\"") : null)>Контакт</a>
+  </li>
 </ul>
