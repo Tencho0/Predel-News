@@ -89,6 +89,7 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         var staticPage = await EnsureStaticPageTypeAsync(seoComposition);
         var contactPage = await EnsureContactPageTypeAsync(seoComposition);
         var allNewsPage = await EnsureAllNewsPageTypeAsync(seoComposition);
+        var searchPage = await EnsureSearchPageTypeAsync(seoComposition);
 
         // 5. Allowed children
         await SetAllowedChildrenAsync(newsRoot, new[] { article });
@@ -96,7 +97,7 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         await SetAllowedChildrenAsync(regionRoot, new[] { region });
         await SetAllowedChildrenAsync(tagRoot, new[] { newsTag });
         await SetAllowedChildrenAsync(authorRoot, new[] { author });
-        await SetAllowedChildrenAsync(homePage, new[] { newsRoot, categoryRoot, regionRoot, tagRoot, authorRoot, allNewsPage, staticPage, contactPage, siteSettings });
+        await SetAllowedChildrenAsync(homePage, new[] { newsRoot, categoryRoot, regionRoot, tagRoot, authorRoot, allNewsPage, staticPage, contactPage, siteSettings, searchPage });
 
         _logger.LogInformation("PredelNews: Content type setup complete");
     }
@@ -372,6 +373,25 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
 
         await _contentTypeService.SaveAsync(ct, SuperUserKey);
         _logger.LogInformation("Created all news page type");
+        return ct;
+    }
+
+    private async Task<IContentType> EnsureSearchPageTypeAsync(IContentType seoComposition)
+    {
+        var existing = _contentTypeService.Get(DocumentTypes.SearchPage);
+        if (existing != null) return existing;
+
+        var ct = new ContentType(_shortStringHelper, -1)
+        {
+            Alias = DocumentTypes.SearchPage,
+            Name = "Страница за търсене",
+            Icon = "icon-search",
+        };
+
+        ct.AddContentType(seoComposition);
+
+        await _contentTypeService.SaveAsync(ct, SuperUserKey);
+        _logger.LogInformation("Created search page type");
         return ct;
     }
 

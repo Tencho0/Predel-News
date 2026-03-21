@@ -1,0 +1,23 @@
+@model PredelNews.Core.ViewModels.SearchResultViewModel
+
+<article class="pn-search-result mb-4 pb-4 border-bottom">
+  <div class="d-flex gap-2 mb-1 small text-muted">
+    @if (Model.CategoryName != null)
+    {
+      <span class="badge bg-primary">@Model.CategoryName</span>
+    }
+    @if (Model.RegionName != null)
+    {
+      <span class="badge bg-secondary">@Model.RegionName</span>
+    }
+    @if (Model.IsSponsored)
+    {
+      <span class="badge bg-warning text-dark">Платена публикация</span>
+    }
+  </div>
+  <h2 class="h5 mb-1">
+    <a href="@Model.ArticleUrl" class="text-decoration-none">@Html.Raw(Model.Headline)</a>
+  </h2>
+  <p class="text-muted small mb-1">@Model.PublishDate.ToString("dd.MM.yyyy")</p>
+  <p class="mb-0">@Html.Raw(Model.Excerpt)</p>
+</article>

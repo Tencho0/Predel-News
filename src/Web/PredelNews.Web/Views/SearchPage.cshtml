@@ -1,0 +1,85 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<PredelNews.Core.ViewModels.SearchPageViewModel>
+
+<section class="py-4">
+  <div class="container">
+    @await Html.PartialAsync("_Breadcrumb", Model.Breadcrumbs)
+
+    <h1 class="mb-3">Търсене</h1>
+
+    <form action="/tarsene" method="get" class="mb-4">
+      <div class="input-group">
+        <input type="text" name="q" value="@Model.Query" placeholder="Търсене на новини..."
+               class="form-control" autocomplete="off" aria-label="Търсене" />
+        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Търсене</button>
+      </div>
+    </form>
+
+    @if (Model.HasError)
+    {
+      <div class="alert alert-danger" role="alert">@Model.ErrorMessage</div>
+    }
+    else if (!string.IsNullOrEmpty(Model.Query))
+    {
+      if (Model.IsEmpty)
+      {
+        <div class="alert alert-info" role="alert">
+          Няма намерени резултати за &bdquo;@Model.Query&ldquo;. Опитайте с различни ключови думи.
+        </div>
+      }
+      else
+      {
+        <p class="text-muted mb-4">Намерени @Model.TotalResults резултата за &bdquo;@Model.Query&ldquo;</p>
+
+        <div class="row g-4">
+          <div class="col-lg-8">
+            @foreach (var result in Model.Results)
+            {
+              @await Html.PartialAsync("_SearchResult", result)
+            }
+
+            @{
+              var p = Model.Pagination;
+              var totalPages = p.TotalPages;
+            }
+            @if (totalPages > 1)
+            {
+              <nav aria-label="Навигация между страници" class="mt-4">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item @(p.CurrentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link" href="@SearchPageUrl(p.CurrentPage - 1)">
+                      <i class="bi bi-chevron-left"></i> Предишна
+                    </a>
+                  </li>
+                  @for (var i = 1; i <= totalPages; i++)
+                  {
+                    <li class="page-item @(i == p.CurrentPage ? "active" : "")">
+                      <a class="page-link" href="@SearchPageUrl(i)">@i</a>
+                    </li>
+                  }
+                  <li class="page-item @(p.CurrentPage >= totalPages ? "disabled" : "")">
+                    <a class="page-link" href="@SearchPageUrl(p.CurrentPage + 1)">
+                      Следваща <i class="bi bi-chevron-right"></i>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            }
+          </div>
+
+          <aside class="col-lg-4">
+            <div class="pn-ad-slot pn-ad-sidebar mb-4"><span>300 &times; 250</span></div>
+          </aside>
+        </div>
+      }
+    }
+  </div>
+</section>
+
+@functions {
+    string SearchPageUrl(int page)
+    {
+        var q = Uri.EscapeDataString(Model.Query ?? "");
+        if (page <= 1) return $"/tarsene?q={q}";
+        return $"/tarsene?q={q}&page={page}";
+    }
+}
