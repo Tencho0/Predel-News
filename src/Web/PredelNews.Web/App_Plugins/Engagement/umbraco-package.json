@@ -1,0 +1,26 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "id": "PredelNews.Engagement",
+  "name": "Предел Нюз — Ангажираност",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "dashboard",
+      "alias": "PredelNews.Engagement.Dashboard",
+      "name": "Engagement Dashboard",
+      "js": "/App_Plugins/Engagement/engagement-dashboard.element.js",
+      "elementName": "predelnews-engagement-dashboard",
+      "weight": 20,
+      "meta": {
+        "label": "Ангажираност",
+        "pathname": "engagement"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "Umb.Section.Content"
+        }
+      ]
+    }
+  ]
+}

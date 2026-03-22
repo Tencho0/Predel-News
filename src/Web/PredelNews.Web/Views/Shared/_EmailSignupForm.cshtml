@@ -1,0 +1,29 @@
+@* Email signup form partial — included on HomePage *@
+<section class="py-4 bg-primary text-white">
+    <div class="container">
+        <form id="email-signup-form" class="row g-3 align-items-center justify-content-center">
+            @Html.AntiForgeryToken()
+            <div class="col-12 text-center mb-2">
+                <h5 class="mb-0">Абонирайте се за нашия бюлетин</h5>
+            </div>
+            <div class="col-md-4">
+                <input type="email" id="signup-email" name="email" class="form-control"
+                       placeholder="Вашият имейл адрес" required />
+            </div>
+            <div class="col-md-auto">
+                <div class="form-check">
+                    <input type="checkbox" id="signup-consent" name="consent" value="true" class="form-check-input" />
+                    <label for="signup-consent" class="form-check-label small">
+                        Съгласен/а съм да получавам новини по имейл
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-light">Абонирай се</button>
+            </div>
+            <div class="col-12">
+                <div id="signup-message" class="d-none text-center mt-2"></div>
+            </div>
+        </form>
+    </div>
+</section>

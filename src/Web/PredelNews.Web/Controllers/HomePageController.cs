@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.OutputCaching;
 using PredelNews.Core.Constants;
 using PredelNews.Core.ViewModels;
+using PredelNews.Core.Services;
 using PredelNews.Web.Services;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
@@ -16,17 +17,20 @@ public class HomePageController : RenderController
 {
     private readonly UmbracoHelper _umbracoHelper;
     private readonly ContentMapperService _mapper;
+    private readonly IPollService _pollService;
 
     public HomePageController(
         ILogger<HomePageController> logger,
         ICompositeViewEngine compositeViewEngine,
         IUmbracoContextAccessor umbracoContextAccessor,
         UmbracoHelper umbracoHelper,
-        ContentMapperService mapper)
+        ContentMapperService mapper,
+        IPollService pollService)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _umbracoHelper = umbracoHelper;
         _mapper = mapper;
+        _pollService = pollService;
     }
 
     [OutputCache(PolicyName = "PublicPage", Tags = ["home"])]
@@ -113,6 +117,12 @@ public class HomePageController : RenderController
         model.CurrentPage = page;
         model.LatestArticles = _mapper.MapArticleSummaries(
             allArticles.Skip((page - 1) * pageSize).Take(pageSize));
+
+        // Active poll for sidebar widget
+        // Note: sync-over-async is required here because Umbraco's RenderController.Index()
+        // is synchronous and cannot be overridden as async. Safe because this is a single
+        // fast DB query and the output cache minimizes how often this runs.
+        model.ActivePoll = _pollService.GetActivePollForDisplayAsync().GetAwaiter().GetResult();
 
         ViewBag.Title = model.PageTitle;
         ViewBag.SeoTitle = model.SeoTitle ?? model.PageTitle;

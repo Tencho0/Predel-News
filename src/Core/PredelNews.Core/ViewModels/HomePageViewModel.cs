@@ -9,4 +9,5 @@ public class HomePageViewModel : BasePageViewModel
     public List<ArticleSummaryViewModel> LatestArticles { get; set; } = [];
     public int LatestArticlesTotalCount { get; set; }
     public int CurrentPage { get; set; } = 1;
+    public PollWidgetViewModel? ActivePoll { get; set; }
 }

@@ -1,0 +1,21 @@
+@* Poll widget partial — client-side rendered to avoid output cache issues *@
+@using System.Text.Json
+@using System.Text.Encodings.Web
+@model PredelNews.Core.ViewModels.PollWidgetViewModel
+
+@if (Model != null)
+{
+    var pollJson = JsonSerializer.Serialize(Model, new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    });
+    <section class="card mb-4">
+        <div class="card-body">
+            <div id="poll-widget"
+                 data-poll='@Html.Raw(pollJson)'>
+            </div>
+            @Html.AntiForgeryToken()
+        </div>
+    </section>
+}
