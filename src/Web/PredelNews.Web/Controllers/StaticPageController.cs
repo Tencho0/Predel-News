@@ -55,6 +55,7 @@ public class StaticPageController : RenderController
         ViewBag.SeoDescription = model.SeoDescription;
         ViewBag.CanonicalUrl = $"{Request.Scheme}://{Request.Host}{CurrentPage!.Url()}";
         ViewBag.OgImageUrl = ogImageUrl;
+        ViewBag.Breadcrumbs = model.Breadcrumbs;
         return CurrentTemplate(model);
     }
 }

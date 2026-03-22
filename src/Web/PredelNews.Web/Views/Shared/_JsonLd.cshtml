@@ -32,8 +32,22 @@
         "name": "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Model.SponsorName))"
     },</text>
     }
+    @if (!string.IsNullOrEmpty(Model.SeoDescription) || !string.IsNullOrEmpty(Model.Subtitle))
+    {
+        <text>"description": "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Model.SeoDescription ?? Model.Subtitle ?? ""))",</text>
+    }
+    @if (!string.IsNullOrEmpty(Model.CanonicalUrl) || !string.IsNullOrEmpty(Model.ShareUrl))
+    {
+        <text>"url": "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Model.CanonicalUrl ?? Model.ShareUrl ?? ""))",</text>
+    }
+    "isAccessibleForFree": true,
     "publisher": {
         "@@type": "NewsMediaOrganization",
+        "name": "PredelNews",
+        "url": "https://predelnews.bg"
+    },
+    "isPartOf": {
+        "@@type": "WebSite",
         "name": "PredelNews",
         "url": "https://predelnews.bg"
     },

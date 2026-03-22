@@ -84,6 +84,7 @@ public class AllNewsPageController : RenderController
         ViewBag.SeoDescription = model.SeoDescription;
         ViewBag.CanonicalUrl = $"{Request.Scheme}://{Request.Host}{content.Url()}";
         ViewBag.OgImageUrl = ogImageUrl;
+        ViewBag.Breadcrumbs = model.Breadcrumbs;
         return CurrentTemplate(model);
     }
 }

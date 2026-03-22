@@ -1,0 +1,13 @@
+{
+  "name": "PredelNews",
+  "short_name": "PredelNews",
+  "description": "Регионални новини от Югозападна България",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    { "src": "/images/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/favicon.ico", "sizes": "16x16 32x32", "type": "image/x-icon" }
+  ]
+}

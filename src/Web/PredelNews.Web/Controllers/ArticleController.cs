@@ -123,6 +123,7 @@ public class ArticleController : RenderController
         ViewBag.PublishedTime = model.PublishDate.ToString("yyyy-MM-ddTHH:mm:sszzz");
         if (model.UpdatedDate.HasValue)
             ViewBag.ModifiedTime = model.UpdatedDate.Value.ToString("yyyy-MM-ddTHH:mm:sszzz");
+        ViewBag.Breadcrumbs = model.Breadcrumbs;
         return CurrentTemplate(model);
     }
 

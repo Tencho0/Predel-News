@@ -1,0 +1,22 @@
+<div id="pn-cookie-consent" style="display:none; position:fixed; bottom:0; left:0; width:100%; z-index:9999; background:#1a1a2e; color:#fff; padding:16px 0; box-shadow:0 -2px 8px rgba(0,0,0,.3);">
+    <div class="container d-flex flex-column flex-sm-row align-items-center justify-content-between gap-3">
+        <p class="mb-0 small">Този сайт използва бисквитки за подобряване на потребителското изживяване. Продължавайки да разглеждате, вие се съгласявате с употребата им.</p>
+        <button id="pn-cookie-accept" class="btn btn-sm btn-light text-nowrap" style="min-width:100px;">Приемам</button>
+    </div>
+</div>
+<script>
+    (function() {
+        if (!document.cookie.split('; ').some(function(c) { return c === 'pn_cookie_consent=1'; })) {
+            var banner = document.getElementById('pn-cookie-consent');
+            banner.style.display = 'block';
+            document.getElementById('pn-cookie-accept').addEventListener('click', function() {
+                var d = new Date();
+                d.setTime(d.getTime() + 365 * 24 * 60 * 60 * 1000);
+                document.cookie = 'pn_cookie_consent=1;expires=' + d.toUTCString() + ';path=/;SameSite=Lax;Secure';
+                banner.style.transition = 'opacity 0.3s ease';
+                banner.style.opacity = '0';
+                setTimeout(function() { banner.style.display = 'none'; }, 300);
+            });
+        }
+    })();
+</script>
