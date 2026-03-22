@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /umbraco/
+
+Sitemap: https://predelnews.bg/sitemap.xml

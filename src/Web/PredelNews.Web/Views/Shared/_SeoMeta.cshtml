@@ -49,6 +49,13 @@ else
     <meta property="article:modified_time" content="@modifiedTime">
 }
 
-<meta property="og:type" content="website">
+@if (!string.IsNullOrEmpty(publishedTime))
+{
+    <meta property="og:type" content="article">
+}
+else
+{
+    <meta property="og:type" content="website">
+}
 <meta property="og:locale" content="bg_BG">
 <meta property="og:site_name" content="PredelNews">

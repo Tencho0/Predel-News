@@ -1,4 +1,5 @@
 using PredelNews.Core.Notifications;
+using PredelNews.Web.NotificationHandlers;
 using PredelNews.Web.Setup;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -27,5 +28,8 @@ public class ContentSetupComposer : IComposer
         builder.AddNotificationAsyncHandler<ContentPublishingNotification, ArticlePublishingHandler>();
         builder.AddNotificationAsyncHandler<ContentPublishedNotification, ArticlePublishedHandler>();
         builder.AddNotificationAsyncHandler<ContentUnpublishedNotification, ArticleUnpublishedHandler>();
+
+        // EPIC-08: SEO — sitemap cache invalidation on any content publish
+        builder.AddNotificationAsyncHandler<ContentPublishedNotification, SitemapCacheInvalidator>();
     }
 }

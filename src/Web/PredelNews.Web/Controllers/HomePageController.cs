@@ -18,6 +18,7 @@ public class HomePageController : RenderController
     private readonly UmbracoHelper _umbracoHelper;
     private readonly ContentMapperService _mapper;
     private readonly IPollService _pollService;
+    private readonly ISiteSettingsService _siteSettings;
 
     public HomePageController(
         ILogger<HomePageController> logger,
@@ -25,12 +26,14 @@ public class HomePageController : RenderController
         IUmbracoContextAccessor umbracoContextAccessor,
         UmbracoHelper umbracoHelper,
         ContentMapperService mapper,
-        IPollService pollService)
+        IPollService pollService,
+        ISiteSettingsService siteSettings)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _umbracoHelper = umbracoHelper;
         _mapper = mapper;
         _pollService = pollService;
+        _siteSettings = siteSettings;
     }
 
     [OutputCache(PolicyName = "PublicPage", Tags = ["home"])]
@@ -124,9 +127,15 @@ public class HomePageController : RenderController
         // fast DB query and the output cache minimizes how often this runs.
         model.ActivePoll = _pollService.GetActivePollForDisplayAsync().GetAwaiter().GetResult();
 
+        var ogImage = content.Value<IPublishedContent>(PropertyAliases.OgImage);
+        var ogImageUrl = ogImage?.GetCropUrl(width: 1200)
+            ?? _siteSettings.GetSiteSettings().DefaultOgImageUrl;
+
         ViewBag.Title = model.PageTitle;
         ViewBag.SeoTitle = model.SeoTitle ?? model.PageTitle;
         ViewBag.SeoDescription = model.SeoDescription;
+        ViewBag.CanonicalUrl = $"{Request.Scheme}://{Request.Host}{CurrentPage!.Url()}";
+        ViewBag.OgImageUrl = ogImageUrl;
         return CurrentTemplate(model);
     }
 

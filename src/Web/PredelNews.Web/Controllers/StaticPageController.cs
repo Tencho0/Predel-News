@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.OutputCaching;
 using PredelNews.Core.Constants;
+using PredelNews.Core.Services;
 using PredelNews.Core.ViewModels;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
@@ -12,12 +13,16 @@ namespace PredelNews.Web.Controllers;
 
 public class StaticPageController : RenderController
 {
+    private readonly ISiteSettingsService _siteSettings;
+
     public StaticPageController(
         ILogger<StaticPageController> logger,
         ICompositeViewEngine compositeViewEngine,
-        IUmbracoContextAccessor umbracoContextAccessor)
+        IUmbracoContextAccessor umbracoContextAccessor,
+        ISiteSettingsService siteSettings)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
+        _siteSettings = siteSettings;
     }
 
     [OutputCache(PolicyName = "PublicPage")]
@@ -41,9 +46,15 @@ public class StaticPageController : RenderController
             ],
         };
 
+        var ogImage = content.Value<IPublishedContent>(PropertyAliases.OgImage);
+        var ogImageUrl = ogImage?.GetCropUrl(width: 1200)
+            ?? _siteSettings.GetSiteSettings().DefaultOgImageUrl;
+
         ViewBag.Title = model.PageTitle;
         ViewBag.SeoTitle = model.SeoTitle ?? model.PageTitle;
         ViewBag.SeoDescription = model.SeoDescription;
+        ViewBag.CanonicalUrl = $"{Request.Scheme}://{Request.Host}{CurrentPage!.Url()}";
+        ViewBag.OgImageUrl = ogImageUrl;
         return CurrentTemplate(model);
     }
 }

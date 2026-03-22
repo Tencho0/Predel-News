@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.OutputCaching;
 using PredelNews.Core.Constants;
+using PredelNews.Core.Services;
 using PredelNews.Core.ViewModels;
 using PredelNews.Web.Services;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -16,17 +17,20 @@ public class CategoryController : RenderController
 {
     private readonly UmbracoHelper _umbracoHelper;
     private readonly ContentMapperService _mapper;
+    private readonly ISiteSettingsService _siteSettings;
 
     public CategoryController(
         ILogger<CategoryController> logger,
         ICompositeViewEngine compositeViewEngine,
         IUmbracoContextAccessor umbracoContextAccessor,
         UmbracoHelper umbracoHelper,
-        ContentMapperService mapper)
+        ContentMapperService mapper,
+        ISiteSettingsService siteSettings)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _umbracoHelper = umbracoHelper;
         _mapper = mapper;
+        _siteSettings = siteSettings;
     }
 
     [OutputCache(PolicyName = "PublicPage")]
@@ -74,9 +78,15 @@ public class CategoryController : RenderController
             ],
         };
 
-        ViewBag.Title = model.PageTitle;
-        ViewBag.SeoTitle = model.SeoTitle ?? model.PageTitle;
+        var ogImage = content.Value<IPublishedContent>(PropertyAliases.OgImage);
+        var ogImageUrl = ogImage?.GetCropUrl(width: 1200)
+            ?? _siteSettings.GetSiteSettings().DefaultOgImageUrl;
+
+        ViewBag.Title = $"{categoryName} — Новини";
+        ViewBag.SeoTitle = content.Value<string>(PropertyAliases.SeoTitle) ?? $"{categoryName} — Новини";
         ViewBag.SeoDescription = model.SeoDescription;
+        ViewBag.CanonicalUrl = $"{Request.Scheme}://{Request.Host}{content.Url()}";
+        ViewBag.OgImageUrl = ogImageUrl;
         return CurrentTemplate(model);
     }
 }

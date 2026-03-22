@@ -18,6 +18,7 @@ public class ArticleController : RenderController
     private readonly UmbracoHelper _umbracoHelper;
     private readonly ContentMapperService _mapper;
     private readonly ICommentService _commentService;
+    private readonly ISiteSettingsService _siteSettings;
 
     public ArticleController(
         ILogger<ArticleController> logger,
@@ -25,12 +26,14 @@ public class ArticleController : RenderController
         IUmbracoContextAccessor umbracoContextAccessor,
         UmbracoHelper umbracoHelper,
         ContentMapperService mapper,
-        ICommentService commentService)
+        ICommentService commentService,
+        ISiteSettingsService siteSettings)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _umbracoHelper = umbracoHelper;
         _mapper = mapper;
         _commentService = commentService;
+        _siteSettings = siteSettings;
     }
 
     [OutputCache(PolicyName = "PublicPage")]
@@ -43,6 +46,7 @@ public class ArticleController : RenderController
         var coverImage = content.Value<IPublishedContent>(PropertyAliases.CoverImage);
         var tags = content.Value<IEnumerable<IPublishedContent>>(PropertyAliases.Tags)?.ToList() ?? [];
 
+        var ogImage = content.Value<IPublishedContent>(PropertyAliases.OgImage);
         var headline = content.Value<string>(PropertyAliases.Headline) ?? content.Name ?? "";
         var categoryName = category?.Value<string>(PropertyAliases.CategoryName) ?? category?.Name;
         var shareUrl = $"{Request.Scheme}://{Request.Host}{content.Url()}";
@@ -56,7 +60,9 @@ public class ArticleController : RenderController
             PageTitle = headline,
             SeoTitle = content.Value<string>(PropertyAliases.SeoTitle) ?? headline,
             SeoDescription = content.Value<string>(PropertyAliases.SeoDescription),
-            OgImageUrl = coverImage?.GetCropUrl(width: 1200, furtherOptions: "&format=webp"),
+            OgImageUrl = ogImage?.GetCropUrl(width: 1200)
+                ?? coverImage?.GetCropUrl(width: 1200, furtherOptions: "&format=webp")
+                ?? _siteSettings.GetSiteSettings().DefaultOgImageUrl,
             CanonicalUrl = shareUrl,
             Headline = headline,
             Subtitle = content.Value<string>(PropertyAliases.Subtitle),
