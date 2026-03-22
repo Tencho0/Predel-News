@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.OutputCaching;
 using PredelNews.Core.Constants;
+using PredelNews.Core.Services;
 using PredelNews.Core.ViewModels;
 using PredelNews.Web.Services;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -16,17 +17,20 @@ public class ArticleController : RenderController
 {
     private readonly UmbracoHelper _umbracoHelper;
     private readonly ContentMapperService _mapper;
+    private readonly ICommentService _commentService;
 
     public ArticleController(
         ILogger<ArticleController> logger,
         ICompositeViewEngine compositeViewEngine,
         IUmbracoContextAccessor umbracoContextAccessor,
         UmbracoHelper umbracoHelper,
-        ContentMapperService mapper)
+        ContentMapperService mapper,
+        ICommentService commentService)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _umbracoHelper = umbracoHelper;
         _mapper = mapper;
+        _commentService = commentService;
     }
 
     [OutputCache(PolicyName = "PublicPage")]
@@ -43,8 +47,12 @@ public class ArticleController : RenderController
         var categoryName = category?.Value<string>(PropertyAliases.CategoryName) ?? category?.Name;
         var shareUrl = $"{Request.Scheme}://{Request.Host}{content.Url()}";
 
+        var comments = _commentService.GetVisibleCommentsAsync(content.Id).GetAwaiter().GetResult();
+        var commentCount = _commentService.GetCommentCountAsync(content.Id).GetAwaiter().GetResult();
+
         var model = new ArticleDetailViewModel
         {
+            ArticleId = content.Id,
             PageTitle = headline,
             SeoTitle = content.Value<string>(PropertyAliases.SeoTitle) ?? headline,
             SeoDescription = content.Value<string>(PropertyAliases.SeoDescription),
@@ -97,6 +105,9 @@ public class ArticleController : RenderController
         {
             model.RelatedArticles = GetRelatedArticles(content, category, region, tags);
         }
+
+        model.Comments = comments;
+        model.CommentCount = commentCount;
 
         ViewBag.Title = model.PageTitle;
         ViewBag.SeoTitle = model.SeoTitle ?? model.Headline;

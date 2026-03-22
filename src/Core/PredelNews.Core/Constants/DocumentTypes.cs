@@ -17,4 +17,5 @@ public static class DocumentTypes
     public const string RegionRoot = "regionRoot";
     public const string TagRoot = "tagRoot";
     public const string AuthorRoot = "authorRoot";
+    public const string SearchPage = "searchPage";
 }

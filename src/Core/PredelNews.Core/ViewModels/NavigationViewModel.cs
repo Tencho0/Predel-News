@@ -4,6 +4,7 @@ public class NavigationViewModel
 {
     public List<NavItem> Categories { get; set; } = [];
     public List<NavItem> Regions { get; set; } = [];
+    public string CurrentPath { get; set; } = "";
 }
 
 public class NavItem

@@ -1,0 +1,32 @@
+@model PredelNews.Core.ViewModels.CommentListViewModel
+
+<div id="comment-list">
+  @if (Model.Comments.Count == 0)
+  {
+    <p class="text-meta small" id="no-comments-message">Все още няма коментари. Бъдете първият!</p>
+  }
+  else
+  {
+    foreach (var comment in Model.Comments)
+    {
+      <div class="pn-comment border-bottom py-3" data-comment-id="@comment.Id">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <strong class="d-block mb-1">@comment.DisplayName</strong>
+            <small class="text-meta">@comment.CreatedAt.ToString("dd.MM.yyyy, HH:mm")</small>
+          </div>
+          @if (Model.CanModerate)
+          {
+            <button type="button"
+                    class="btn btn-sm btn-outline-danger pn-comment-delete"
+                    data-comment-id="@comment.Id"
+                    title="Изтриване">
+              <i class="bi bi-trash"></i>
+            </button>
+          }
+        </div>
+        <p class="mt-2 mb-0">@comment.CommentText</p>
+      </div>
+    }
+  }
+</div>

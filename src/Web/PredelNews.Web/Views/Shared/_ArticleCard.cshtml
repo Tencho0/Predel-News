@@ -43,7 +43,7 @@
                 <time datetime="@Model.PublishDate.ToString("yyyy-MM-dd")">@Model.PublishDate.ToString("dd MMM yyyy")</time>
                 @if (Model.CommentCount > 0)
                 {
-                    <text> &middot; <i class="bi bi-chat-dots"></i> @Model.CommentCount</text>
+                    <text> &middot; <a href="@(Model.ArticleUrl)#comments" class="text-decoration-none text-meta"><i class="bi bi-chat-dots"></i> @Model.CommentCount</a></text>
                 }
             </div>
         </div>
@@ -88,7 +88,7 @@ else
                 <time datetime="@Model.PublishDate.ToString("yyyy-MM-dd")">@Model.PublishDate.ToString("dd MMMM yyyy")</time>
                 @if (Model.CommentCount > 0)
                 {
-                    <span>&middot;</span><span><i class="bi bi-chat-dots"></i> @Model.CommentCount</span>
+                    <span>&middot;</span><span><a href="@(Model.ArticleUrl)#comments" class="text-decoration-none text-meta"><i class="bi bi-chat-dots"></i> @Model.CommentCount</a></span>
                 }
             </div>
         </div>
