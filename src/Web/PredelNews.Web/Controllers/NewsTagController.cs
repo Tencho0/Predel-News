@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.OutputCaching;
 using PredelNews.Core.Constants;
 using PredelNews.Core.ViewModels;
 using PredelNews.Web.Services;
@@ -28,6 +29,7 @@ public class NewsTagController : RenderController
         _mapper = mapper;
     }
 
+    [OutputCache(PolicyName = "PublicPage")]
     public override IActionResult Index()
     {
         var content = CurrentPage!;

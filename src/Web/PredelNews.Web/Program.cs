@@ -36,6 +36,13 @@ try
     builder.Services.AddPredelNewsBackofficeExtensions();
     builder.Services.AddScoped<ISiteSettingsService, SiteSettingsService>();
     builder.Services.AddScoped<ContentMapperService>();
+    builder.Services.AddSingleton<PredelNews.Core.Interfaces.ICacheInvalidationService, OutputCacheInvalidationService>();
+
+    builder.Services.AddOutputCache(options =>
+    {
+        options.AddPolicy("PublicPage", policy =>
+            policy.Expire(TimeSpan.FromSeconds(60)));
+    });
 
     builder.CreateUmbracoBuilder()
         .AddBackOffice()
@@ -50,6 +57,8 @@ try
     app.UseSerilogRequestLogging();
     app.UseStatusCodePagesWithReExecute("/error/{0}");
     app.UseHttpsRedirection();
+
+    app.UseOutputCache();
 
     app.UseUmbraco()
         .WithMiddleware(u =>

@@ -46,6 +46,10 @@
               </a>
             }
             <span><i class="bi bi-calendar3 me-1"></i><time datetime="@Model.PublishDate.ToString("yyyy-MM-dd")">@Model.PublishDate.ToString("dd MMMM yyyy, HH:mm")</time></span>
+            @if (Model.UpdatedDate.HasValue)
+            {
+              <span class="small text-meta">Обновена: @Model.UpdatedDate.Value.ToString("dd.MM.yyyy, HH:mm")</span>
+            }
             @if (Model.CommentCount > 0)
             {
               <span><i class="bi bi-chat-dots me-1"></i>@Model.CommentCount коментара</span>

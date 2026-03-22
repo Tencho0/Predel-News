@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.OutputCaching;
 using PredelNews.Core.Constants;
 using PredelNews.Core.ViewModels;
 using PredelNews.Web.Services;
@@ -28,6 +29,7 @@ public class ArticleController : RenderController
         _mapper = mapper;
     }
 
+    [OutputCache(PolicyName = "PublicPage")]
     public override IActionResult Index()
     {
         var content = CurrentPage!;
@@ -73,6 +75,7 @@ public class ArticleController : RenderController
             AuthorPhotoUrl = author?.Value<IPublishedContent>(PropertyAliases.Photo)?.GetCropUrl(width: 80, furtherOptions: "&format=webp"),
             AuthorBio = author?.Value<string>(PropertyAliases.Bio),
             PublishDate = content.Value<DateTime>(PropertyAliases.PublishDate),
+            UpdatedDate = content.Value<DateTime?>(PropertyAliases.UpdatedDate),
             IsSponsored = content.Value<bool>(PropertyAliases.IsSponsored),
             SponsorName = content.Value<string>(PropertyAliases.SponsorName),
             ShareUrl = shareUrl,

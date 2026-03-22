@@ -1,0 +1,19 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "PredelNews.Backoffice",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "dashboard",
+      "alias": "PredelNews.Dashboard.Editorial",
+      "name": "Editorial Dashboard",
+      "js": "/App_Plugins/PredelNews.Backoffice/editorial-dashboard.element.js",
+      "elementName": "predelnews-editorial-dashboard",
+      "weight": 100,
+      "meta": { "label": "Editorial", "pathname": "editorial" },
+      "conditions": [
+        { "alias": "Umb.Condition.SectionAlias", "match": "Umb.Section.Content" }
+      ]
+    }
+  ]
+}
