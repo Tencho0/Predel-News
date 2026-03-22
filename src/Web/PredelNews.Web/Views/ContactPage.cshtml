@@ -1,4 +1,4 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<PredelNews.Core.ViewModels.ContactPageViewModel>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<PredelNews.Core.ViewModels.ContactPageViewModel>
 
 <section class="py-5 bg-surface">
   <div class="container">
@@ -12,8 +12,9 @@
     <div class="row g-5">
       <div class="col-lg-7">
         <div class="bg-white rounded p-4 shadow-sm">
-          <!-- Contact form — submission logic deferred to EPIC-07 -->
-          <form>
+          <div id="contact-message" class="d-none"></div>
+          <form id="contact-form">
+            @Html.AntiForgeryToken()
             <div class="mb-3">
               <label class="form-label small fw-semibold" for="c-name">Вашето име *</label>
               <input type="text" class="form-control" id="c-name" name="name" required>
@@ -37,7 +38,7 @@
               <textarea class="form-control" id="c-message" name="message" rows="5" required placeholder="Напишете вашето съобщение..."></textarea>
             </div>
             <div class="pn-hp" aria-hidden="true">
-              <input type="text" name="fax" tabindex="-1" autocomplete="off">
+              <input type="text" name="phone_extra" tabindex="-1" autocomplete="off">
             </div>
             <button type="submit" class="btn btn-primary btn-lg">
               <i class="bi bi-send me-2"></i>Изпрати
@@ -74,3 +75,7 @@
     </div>
   </div>
 </section>
+
+@section Scripts {
+  <script src="~/js/contact-form.js?v=1.0.0" defer></script>
+}

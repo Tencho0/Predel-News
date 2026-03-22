@@ -9,6 +9,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<ISlugGenerator, SlugGenerator>();
         services.AddScoped<ICommentService, CommentService>();
+        services.AddScoped<IContactFormService, ContactFormService>();
+        services.AddScoped<IEmailSignupService, EmailSignupService>();
+        services.AddScoped<IPollService, PollService>();
         return services;
     }
 }

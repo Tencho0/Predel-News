@@ -14,6 +14,7 @@ public class ContentTreeSetup : INotificationAsyncHandler<UmbracoApplicationStar
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
     private readonly IContentPublishingService _contentPublishingService;
+    private readonly IDataTypeService _dataTypeService;
     private readonly ILogger<ContentTreeSetup> _logger;
 
     private static readonly Guid SuperUserKey = Constants.Security.SuperUserKey;
@@ -22,11 +23,13 @@ public class ContentTreeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         IContentService contentService,
         IContentTypeService contentTypeService,
         IContentPublishingService contentPublishingService,
+        IDataTypeService dataTypeService,
         ILogger<ContentTreeSetup> logger)
     {
         _contentService = contentService;
         _contentTypeService = contentTypeService;
         _contentPublishingService = contentPublishingService;
+        _dataTypeService = dataTypeService;
         _logger = logger;
     }
 
@@ -57,7 +60,7 @@ public class ContentTreeSetup : INotificationAsyncHandler<UmbracoApplicationStar
             await PublishAsync(existingHome);
 
             // Apply the same fix to all published children (containers, static pages, contact).
-            var allChildren = _contentService.GetPagedChildren(existingHome.Id, 0, 100, out _);
+            var allChildren = _contentService.GetPagedChildren(existingHome.Id, 0, 100, out _).ToList();
             foreach (var child in allChildren.Where(c => c.Published))
             {
                 ApplyDefaultTemplate(child);
@@ -65,6 +68,8 @@ public class ContentTreeSetup : INotificationAsyncHandler<UmbracoApplicationStar
                 await PublishAsync(child);
                 _logger.LogInformation("Refreshed template for: {Name}", child.Name);
             }
+
+            await UpdatePickerStartNodesAsync(allChildren);
 
             _logger.LogInformation("PredelNews: Content tree setup complete");
             return;
@@ -135,6 +140,10 @@ public class ContentTreeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         settings.SetValue(PropertyAliases.SiteName, "PredelNews");
         _contentService.Save(settings);
 
+        // Update picker data types with start nodes now that content tree exists
+        var createdChildren = _contentService.GetPagedChildren(home.Id, 0, 100, out _).ToList();
+        await UpdatePickerStartNodesAsync(createdChildren);
+
         _logger.LogInformation("PredelNews: Content tree setup complete");
     }
 
@@ -149,6 +158,50 @@ public class ContentTreeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         var defaultTemplate = contentType?.DefaultTemplate;
         if (defaultTemplate != null)
             content.TemplateId = defaultTemplate.Id;
+    }
+
+    private async Task UpdatePickerStartNodesAsync(List<IContent> homeChildren)
+    {
+        var pickerMappings = new (Guid dataTypeKey, string rootDocTypeAlias)[]
+        {
+            (TinyMceConfigSetup.ArticleCategoryPickerKey, DocumentTypes.CategoryRoot),
+            (TinyMceConfigSetup.ArticleRegionPickerKey,   DocumentTypes.RegionRoot),
+            (TinyMceConfigSetup.ArticleAuthorPickerKey,   DocumentTypes.AuthorRoot),
+            (TinyMceConfigSetup.ArticleTagsPickerKey,     DocumentTypes.TagRoot),
+        };
+
+        foreach (var (dataTypeKey, rootDocTypeAlias) in pickerMappings)
+        {
+            var rootNode = homeChildren.FirstOrDefault(c => c.ContentType.Alias == rootDocTypeAlias);
+            if (rootNode == null) continue;
+
+            var dataType = await _dataTypeService.GetAsync(dataTypeKey);
+            if (dataType == null) continue;
+
+            var config = dataType.ConfigurationData ?? new Dictionary<string, object>();
+            var desiredStartNodeId = $"umb://document/{rootNode.Key:N}";
+
+            // Remove filter if present (causes 400 on tree API)
+            var hasFilter = config.Remove("filter");
+
+            // Check if start node is already set correctly
+            if (!hasFilter
+                && config.TryGetValue("startNode", out var existing) && existing is Dictionary<string, object> dict
+                && dict.TryGetValue("id", out var id) && id?.ToString() == desiredStartNodeId)
+                continue;
+
+            config["startNode"] = new Dictionary<string, object>
+            {
+                ["type"] = "content",
+                ["query"] = "",
+                ["id"] = desiredStartNodeId,
+            };
+            dataType.ConfigurationData = config;
+
+            await _dataTypeService.UpdateAsync(dataType, SuperUserKey);
+            _logger.LogInformation("Set start node for {DataType} to {RootAlias} ({Key})",
+                dataType.Name, rootDocTypeAlias, rootNode.Key);
+        }
     }
 
     private async Task PublishAsync(IContent content)

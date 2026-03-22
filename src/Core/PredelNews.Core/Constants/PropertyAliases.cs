@@ -18,6 +18,10 @@ public static class PropertyAliases
     public const string IsSponsored = "isSponsored";
     public const string SponsorName = "sponsorName";
 
+    // Workflow
+    public const string ArticleStatus = "articleStatus";
+    public const string UpdatedDate = "updatedDate";
+
     // SEO Composition
     public const string SeoTitle = "seoTitle";
     public const string SeoDescription = "seoDescription";

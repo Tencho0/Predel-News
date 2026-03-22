@@ -21,5 +21,11 @@ public class ContentSetupComposer : IComposer
         builder.AddNotificationAsyncHandler<ContentSavingNotification, CoverImageAltTextValidator>();
         builder.AddNotificationAsyncHandler<ContentSavingNotification, ArticleTagCountValidator>();
         builder.AddNotificationAsyncHandler<ContentDeletingNotification, TaxonomyDeleteGuardHandler>();
+
+        // EPIC-04: Editorial workflow
+        builder.AddNotificationAsyncHandler<ContentSavingNotification, ArticleWorkflowGuardHandler>();
+        builder.AddNotificationAsyncHandler<ContentPublishingNotification, ArticlePublishingHandler>();
+        builder.AddNotificationAsyncHandler<ContentPublishedNotification, ArticlePublishedHandler>();
+        builder.AddNotificationAsyncHandler<ContentUnpublishedNotification, ArticleUnpublishedHandler>();
     }
 }

@@ -28,6 +28,10 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
     private IDataType _trueFalse = null!;
     private IDataType _dateTime = null!;
     private IDataType _emailAddress = null!;
+    private IDataType _articleStatusDropdown = null!;
+    private IDataType _categoryPicker = null!;
+    private IDataType _regionPicker = null!;
+    private IDataType _authorPicker = null!;
 
     public ContentTypeSetup(
         IContentTypeService contentTypeService,
@@ -127,6 +131,18 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         // Use custom Article Tags Picker if available, fall back to default Content Picker
         _articleTagsPicker = allDataTypes
             .FirstOrDefault(d => d.Key == TinyMceConfigSetup.ArticleTagsPickerKey) ?? _contentPicker;
+
+        // Use custom Article Status Dropdown if available, fall back to TextBox
+        _articleStatusDropdown = allDataTypes
+            .FirstOrDefault(d => d.Key == TinyMceConfigSetup.ArticleStatusDropdownKey) ?? _textstring;
+
+        // Filtered pickers for Category, Region, Author — fall back to generic Content Picker
+        _categoryPicker = allDataTypes
+            .FirstOrDefault(d => d.Key == TinyMceConfigSetup.ArticleCategoryPickerKey) ?? _contentPicker;
+        _regionPicker = allDataTypes
+            .FirstOrDefault(d => d.Key == TinyMceConfigSetup.ArticleRegionPickerKey) ?? _contentPicker;
+        _authorPicker = allDataTypes
+            .FirstOrDefault(d => d.Key == TinyMceConfigSetup.ArticleAuthorPickerKey) ?? _contentPicker;
     }
 
     private async Task<IContentType> EnsureCompositionAsync(string alias, string name,
@@ -217,7 +233,11 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
     private async Task<IContentType> EnsureArticleTypeAsync(IContentType seoComposition)
     {
         var existing = _contentTypeService.Get(DocumentTypes.Article);
-        if (existing != null) return existing;
+        if (existing != null)
+        {
+            await UpdateArticlePickerDataTypesAsync(existing);
+            return existing;
+        }
 
         var ct = new ContentType(_shortStringHelper, -1)
         {
@@ -234,10 +254,10 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _articleRichtext, PropertyAliases.Body) { Name = "Body", Mandatory = true }, "Content", "Content");
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _mediaPicker, PropertyAliases.CoverImage) { Name = "Cover Image", Mandatory = true }, "Content", "Content");
 
-        ct.AddPropertyType(new PropertyType(_shortStringHelper, _contentPicker, PropertyAliases.Category) { Name = "Category", Mandatory = true }, "Taxonomy", "Taxonomy");
-        ct.AddPropertyType(new PropertyType(_shortStringHelper, _contentPicker, PropertyAliases.Region) { Name = "Region" }, "Taxonomy", "Taxonomy");
+        ct.AddPropertyType(new PropertyType(_shortStringHelper, _categoryPicker, PropertyAliases.Category) { Name = "Category", Mandatory = true }, "Taxonomy", "Taxonomy");
+        ct.AddPropertyType(new PropertyType(_shortStringHelper, _regionPicker, PropertyAliases.Region) { Name = "Region" }, "Taxonomy", "Taxonomy");
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _articleTagsPicker, PropertyAliases.Tags) { Name = "Tags" }, "Taxonomy", "Taxonomy");
-        ct.AddPropertyType(new PropertyType(_shortStringHelper, _contentPicker, PropertyAliases.Author) { Name = "Author", Mandatory = true }, "Taxonomy", "Taxonomy");
+        ct.AddPropertyType(new PropertyType(_shortStringHelper, _authorPicker, PropertyAliases.Author) { Name = "Author", Mandatory = true }, "Taxonomy", "Taxonomy");
 
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _dateTime, PropertyAliases.PublishDate) { Name = "Publish Date", Mandatory = true }, "Settings", "Settings");
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _trueFalse, PropertyAliases.IsBreakingNews) { Name = "Breaking News" }, "Settings", "Settings");
@@ -245,6 +265,9 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
 
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _trueFalse, PropertyAliases.IsSponsored) { Name = "Sponsored Content" }, "Sponsored", "Sponsored");
         ct.AddPropertyType(new PropertyType(_shortStringHelper, _textstring, PropertyAliases.SponsorName) { Name = "Sponsor Name" }, "Sponsored", "Sponsored");
+
+        ct.AddPropertyType(new PropertyType(_shortStringHelper, _articleStatusDropdown, PropertyAliases.ArticleStatus) { Name = "Article Status", Description = "Draft / In Review. Default: Draft." }, "Workflow", "Workflow");
+        ct.AddPropertyType(new PropertyType(_shortStringHelper, _dateTime, PropertyAliases.UpdatedDate) { Name = "Updated Date", Description = "Set automatically on re-publish. Do not edit manually." }, "Workflow", "Workflow");
 
         await _contentTypeService.SaveAsync(ct, SuperUserKey);
         _logger.LogInformation("Created article type");
@@ -374,6 +397,30 @@ public class ContentTypeSetup : INotificationAsyncHandler<UmbracoApplicationStar
         await _contentTypeService.SaveAsync(ct, SuperUserKey);
         _logger.LogInformation("Created all news page type");
         return ct;
+    }
+
+    private async Task UpdateArticlePickerDataTypesAsync(IContentType articleType)
+    {
+        var changed = false;
+        changed |= UpdatePropertyDataType(articleType, PropertyAliases.Category, _categoryPicker);
+        changed |= UpdatePropertyDataType(articleType, PropertyAliases.Region, _regionPicker);
+        changed |= UpdatePropertyDataType(articleType, PropertyAliases.Author, _authorPicker);
+
+        if (changed)
+        {
+            await _contentTypeService.SaveAsync(articleType, SuperUserKey);
+            _logger.LogInformation("Updated article picker data types to use filtered pickers");
+        }
+    }
+
+    private static bool UpdatePropertyDataType(IContentType ct, string propertyAlias, IDataType targetDataType)
+    {
+        var prop = ct.PropertyTypes.FirstOrDefault(p => p.Alias == propertyAlias);
+        if (prop == null || prop.DataTypeId == targetDataType.Id)
+            return false;
+
+        prop.DataTypeId = targetDataType.Id;
+        return true;
     }
 
     private async Task<IContentType> EnsureSearchPageTypeAsync(IContentType seoComposition)

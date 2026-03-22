@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.OutputCaching;
 using PredelNews.Core.Constants;
 using PredelNews.Core.ViewModels;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -19,6 +20,7 @@ public class StaticPageController : RenderController
     {
     }
 
+    [OutputCache(PolicyName = "PublicPage")]
     public override IActionResult Index()
     {
         var content = CurrentPage!;

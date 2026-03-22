@@ -122,6 +122,11 @@
       <aside class="col-lg-4">
         <div class="pn-ad-slot pn-ad-sidebar mb-4"><span>300 &times; 250</span></div>
 
+        @if (Model.ActivePoll != null)
+        {
+          @await Html.PartialAsync("_PollWidget", Model.ActivePoll)
+        }
+
         <!-- Most Read placeholder -->
         <div class="pn-widget p-3 mb-4">
           <h3 class="pn-widget-title mb-3">Най-четено</h3>
@@ -133,3 +138,11 @@
     </div>
   </div>
 </section>
+
+<!-- EMAIL SIGNUP -->
+@await Html.PartialAsync("_EmailSignupForm")
+
+@section Scripts {
+  <script src="~/js/email-signup.js?v=1.0.0" defer></script>
+  <script src="~/js/poll.js?v=1.0.0" defer></script>
+}

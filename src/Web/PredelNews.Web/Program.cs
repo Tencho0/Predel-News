@@ -39,6 +39,13 @@ try
     builder.Services.AddPredelNewsBackofficeExtensions();
     builder.Services.AddScoped<ISiteSettingsService, SiteSettingsService>();
     builder.Services.AddScoped<ContentMapperService>();
+    builder.Services.AddSingleton<PredelNews.Core.Interfaces.ICacheInvalidationService, OutputCacheInvalidationService>();
+
+    builder.Services.AddOutputCache(options =>
+    {
+        options.AddPolicy("PublicPage", policy =>
+            policy.Expire(TimeSpan.FromSeconds(60)));
+    });
 
     builder.Services.AddAntiforgery(options =>
     {
@@ -57,6 +64,24 @@ try
                     SegmentsPerWindow = 5,
                     PermitLimit = 3
                 }));
+        options.AddPolicy("ContactRateLimit", context =>
+            RateLimitPartition.GetSlidingWindowLimiter(
+                partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                factory: _ => new SlidingWindowRateLimiterOptions
+                {
+                    Window = TimeSpan.FromMinutes(10),
+                    SegmentsPerWindow = 5,
+                    PermitLimit = 3
+                }));
+        options.AddPolicy("EmailSignupRateLimit", context =>
+            RateLimitPartition.GetSlidingWindowLimiter(
+                partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                factory: _ => new SlidingWindowRateLimiterOptions
+                {
+                    Window = TimeSpan.FromMinutes(10),
+                    SegmentsPerWindow = 5,
+                    PermitLimit = 5
+                }));
         options.OnRejected = async (context, cancellationToken) =>
         {
             context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
@@ -64,7 +89,7 @@ try
             var body = JsonSerializer.Serialize(new
             {
                 status = "rate_limited",
-                message = "Моля, изчакайте няколко минути преди да публикувате нов коментар."
+                message = "Моля, изчакайте няколко минути преди да опитате отново."
             });
             await context.HttpContext.Response.WriteAsync(body, cancellationToken);
         };
@@ -84,6 +109,8 @@ try
     app.UseStatusCodePagesWithReExecute("/error/{0}");
     app.UseHttpsRedirection();
     app.UseRateLimiter();
+
+    app.UseOutputCache();
 
     app.UseUmbraco()
         .WithMiddleware(u =>
