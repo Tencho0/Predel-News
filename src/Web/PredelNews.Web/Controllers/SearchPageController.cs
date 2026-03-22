@@ -48,6 +48,11 @@ public class SearchPageController : RenderController
         ViewBag.SeoDescription = model.SeoDescription;
         ViewBag.CanonicalUrl = $"{Request.Scheme}://{Request.Host}{CurrentPage!.Url()}{canonicalQuery}";
         ViewBag.OgImageUrl = _siteSettings.GetSiteSettings().DefaultOgImageUrl;
+        ViewBag.Breadcrumbs = new List<PredelNews.Core.ViewModels.BreadcrumbItem>
+        {
+            new() { Name = "Начало", Url = "/" },
+            new() { Name = searchTitle },
+        };
 
         return CurrentTemplate(model);
     }

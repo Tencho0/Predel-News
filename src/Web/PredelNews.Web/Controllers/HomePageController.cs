@@ -136,6 +136,10 @@ public class HomePageController : RenderController
         ViewBag.SeoDescription = model.SeoDescription;
         ViewBag.CanonicalUrl = $"{Request.Scheme}://{Request.Host}{CurrentPage!.Url()}";
         ViewBag.OgImageUrl = ogImageUrl;
+        ViewBag.Breadcrumbs = new List<BreadcrumbItem>
+        {
+            new() { Name = "Начало" },
+        };
         return CurrentTemplate(model);
     }
 
