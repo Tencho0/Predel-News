@@ -85,4 +85,13 @@ public class ArticleBodyProcessorTests
         before.Should().Be("<p>One</p><p>Two</p><p>Three</p>");
         after.Should().BeEmpty();
     }
+
+    [Fact]
+    public void SplitAtParagraph_EmptyBody_ReturnsBothEmpty()
+    {
+        var (before, after) = ArticleBodyProcessor.SplitAtParagraph(string.Empty, 3);
+
+        before.Should().BeEmpty();
+        after.Should().BeEmpty();
+    }
 }

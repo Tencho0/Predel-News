@@ -54,6 +54,9 @@ public class AdManagementApiController : ManagementApiControllerBase
     {
         if (!await IsAdminAsync()) return Forbid();
 
+        if (request.Mode is not "adsense" and not "direct")
+            return BadRequest(new { status = "error", message = "Невалиден режим. Позволени стойности: adsense, direct." });
+
         if (request.Mode == "direct")
         {
             if (string.IsNullOrWhiteSpace(request.BannerImageUrl))
@@ -64,18 +67,24 @@ public class AdManagementApiController : ManagementApiControllerBase
         if (request.StartDate.HasValue && request.EndDate.HasValue && request.StartDate >= request.EndDate)
             return BadRequest(new { status = "error", message = "Началната дата трябва да е преди крайната." });
 
-        var slot = await _adSlotService.GetBySlotIdAsync(slotId);
-        if (slot == null) return NotFound();
+        var existing = await _adSlotService.GetBySlotIdAsync(slotId);
+        if (existing == null) return NotFound();
 
-        slot.Mode = request.Mode;
-        slot.AdsenseCode = request.AdsenseCode;
-        slot.BannerImageUrl = request.BannerImageUrl;
-        slot.BannerDestUrl = request.BannerDestUrl;
-        slot.BannerAltText = request.BannerAltText;
-        slot.StartDate = request.StartDate;
-        slot.EndDate = request.EndDate;
+        var updated = new AdSlot
+        {
+            Id = existing.Id,
+            SlotId = existing.SlotId,
+            SlotName = existing.SlotName,
+            Mode = request.Mode,
+            AdsenseCode = request.AdsenseCode,
+            BannerImageUrl = request.BannerImageUrl,
+            BannerDestUrl = request.BannerDestUrl,
+            BannerAltText = request.BannerAltText,
+            StartDate = request.StartDate,
+            EndDate = request.EndDate,
+        };
 
-        await _adSlotService.UpdateSlotAsync(slot);
+        await _adSlotService.UpdateSlotAsync(updated);
         return Ok(new { status = "updated" });
     }
 
@@ -84,15 +93,17 @@ public class AdManagementApiController : ManagementApiControllerBase
     {
         if (!await IsAdminAsync()) return Forbid();
 
-        var slot = await _adSlotService.GetBySlotIdAsync(slotId);
-        if (slot == null) return NotFound();
+        var existing = await _adSlotService.GetBySlotIdAsync(slotId);
+        if (existing == null) return NotFound();
 
-        slot.Mode = "adsense";
-        slot.BannerImageUrl = null;
-        slot.BannerDestUrl = null;
-        slot.BannerAltText = null;
-        slot.StartDate = null;
-        slot.EndDate = null;
+        var slot = new AdSlot
+        {
+            Id = existing.Id,
+            SlotId = existing.SlotId,
+            SlotName = existing.SlotName,
+            Mode = "adsense",
+            AdsenseCode = existing.AdsenseCode,
+        };
 
         await _adSlotService.UpdateSlotAsync(slot);
         return Ok(new { status = "reset" });
