@@ -2,7 +2,7 @@
 
 <!-- Ad: Header Leaderboard -->
 <div class="container my-3">
-  <div class="pn-ad-slot pn-ad-leaderboard"><span>728 &times; 90</span></div>
+  @await Component.InvokeAsync("AdSlot", new { slotId = "header-leaderboard" })
 </div>
 
 <!-- BREAKING NEWS -->
@@ -120,7 +120,9 @@
 
       <!-- Sidebar -->
       <aside class="col-lg-4">
-        <div class="pn-ad-slot pn-ad-sidebar mb-4"><span>300 &times; 250</span></div>
+        @await Component.InvokeAsync("AdSlot", new { slotId = "sidebar-top" })
+        <div class="mb-4"></div>
+        @await Component.InvokeAsync("AdSlot", new { slotId = "sidebar-bottom" })
 
         @if (Model.ActivePoll != null)
         {
