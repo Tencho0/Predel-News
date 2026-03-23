@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEmailService, SmtpEmailService>();
         services.AddScoped<IEmailSignupRepository, EmailSignupRepository>();
         services.AddScoped<IPollRepository, PollRepository>();
+        services.AddScoped<IAdSlotRepository, AdSlotRepository>();
         return services;
     }
 }
