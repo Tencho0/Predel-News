@@ -112,6 +112,33 @@ public interface IAdSlotRepository
 
 **Registration:** `AddSingleton<IAdSlotService, AdSlotService>` (not `AddScoped`) because the service exists specifically to maintain a cross-request in-memory cache. `IAdSlotRepository` remains `AddScoped`.
 
+**DI lifetime note:** Because `AdSlotService` is a `Singleton` and `AdSlotRepository` is `Scoped`, `AdSlotService` must NOT accept `IAdSlotRepository` via constructor injection (a singleton cannot hold a reference to a scoped service). Instead, inject `IServiceScopeFactory` into `AdSlotService` and resolve `IAdSlotRepository` within a short-lived scope inside `GetAllAsync` and `UpdateSlotAsync`:
+
+```csharp
+public class AdSlotService : IAdSlotService
+{
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IMemoryCache _cache;
+
+    public AdSlotService(IServiceScopeFactory scopeFactory, IMemoryCache cache)
+    {
+        _scopeFactory = scopeFactory;
+        _cache = cache;
+    }
+
+    public async Task<IReadOnlyList<AdSlot>> GetAllAsync()
+    {
+        return await _cache.GetOrCreateAsync("AdSlots:All", async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60);
+            using var scope = _scopeFactory.CreateScope();
+            var repo = scope.ServiceProvider.GetRequiredService<IAdSlotRepository>();
+            return await repo.GetAllAsync();
+        }) ?? [];
+    }
+}
+```
+
 ---
 
 ## Section 2: Rendering Layer
