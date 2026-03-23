@@ -8,7 +8,9 @@
 
 ## Context
 
-PredelNews needs revenue from Day 1. EPIC-09 delivers 7 configurable ad slots (AdSense + direct-sold banners), sponsored article labeling ("Платена публикация"), and admin tooling to manage placements without developer help.
+PredelNews needs revenue from Day 1. EPIC-09 delivers 6 configurable ad slots as defined in the EPIC, plus 1 additional `mobile-sticky` slot that was already seeded in the V1 migration (total: 7 rows in `pn_ad_slots`), sponsored article labeling ("Платена публикация"), and admin tooling to manage placements without developer help.
+
+> **Note on slot count:** The EPIC specifies 6 slots (header leaderboard, sidebar 1, sidebar 2, article mid, article bottom, footer banner). The V1 seed includes `mobile-sticky` instead of `article-bottom`. Per a deliberate design decision, both are implemented: `article-bottom` is added by a V3 migration; `mobile-sticky` is retained from V1. All 6 EPIC-defined slots are present; `mobile-sticky` is an additive enhancement. Acceptance testing should verify all 6 EPIC slots; `mobile-sticky` is bonus scope.
 
 ### What already exists
 
@@ -27,7 +29,7 @@ PredelNews needs revenue from Day 1. EPIC-09 delivers 7 configurable ad slots (A
 
 | Question | Decision | Rationale |
 |---|---|---|
-| Ad slot count | 7 (6 from EPIC + `mobile-sticky`) | Seed already has `mobile-sticky`; `article-bottom` added via V2 migration |
+| Ad slot count | 7 rows (6 EPIC-defined + `mobile-sticky` from V1 seed) | V1 seed omitted `article-bottom`; V3 migration adds it. `mobile-sticky` retained as bonus scope. |
 | Ad slot data delivery | `AdSlotViewComponent` | Matches existing `Navigation` component pattern; independently cacheable |
 | Banner image storage | External URL only | Advertiser-provided assets; no file upload infrastructure at MVP |
 | Sponsored link rewriting | Render-time `HtmlHelper` extension | Reversible; no stored HTML mutation |
@@ -95,17 +97,20 @@ public interface IAdSlotRepository
 
 ### Migration
 
-**`AlterAdSlotsV2Migration`** in `PredelNews.Infrastructure/Migrations/`:
+**`AlterAdSlotsV3Migration`** in `PredelNews.Infrastructure/Migrations/`:
 - Seeds the missing `article-bottom` row: `("article-bottom", "Article Bottom (728x90)", "adsense")`
-- Added as a new state step in `PredelNewsMigrationPlan`
+- Added to `PredelNewsMigrationPlan` with GUID `6A1B2C3D-0003-4000-8000-000000000003`
+- Named V3 to avoid confusion with the existing `AlterPollTablesV2Migration` which already occupies the V2 slot
 
 ### Service
 
-**`PredelNews.Core/Interfaces/IAdSlotService.cs`** / **`PredelNews.Core/Services/AdSlotService.cs`**
+**`PredelNews.Core/Services/IAdSlotService.cs`** / **`PredelNews.Core/Services/AdSlotService.cs`**
 
 - `GetAllAsync()` — cache key `"AdSlots:All"`, 60s absolute expiry via `IMemoryCache`
 - `GetBySlotIdAsync(string slotId)` — reads from `GetAllAsync()` (no separate DB call)
 - `UpdateSlotAsync(AdSlot slot)` — calls `IAdSlotRepository.UpdateAsync`, evicts `"AdSlots:All"`
+
+**Registration:** `AddSingleton<IAdSlotService, AdSlotService>` (not `AddScoped`) because the service exists specifically to maintain a cross-request in-memory cache. `IAdSlotRepository` remains `AddScoped`.
 
 ---
 
@@ -124,6 +129,7 @@ public interface IAdSlotRepository
 **`Views/Shared/Components/AdSlot/_AdSlot.cshtml`**
 ```html
 <div class="pn-ad-slot pn-ad-@Model.SlotId">
+  <span class="pn-ad-label">Реклама</span>
   @if (Model.IsDirectActive)
   {
     <a href="@Model.BannerDestUrl" rel="noopener" target="_blank">
@@ -135,9 +141,10 @@ public interface IAdSlotRepository
   {
     @Html.Raw(Model.AdsenseCode)
   }
-  {{/* "Реклама" label emitted by CSS ::before — no extra markup needed */}}
 </div>
 ```
+
+The `<span class="pn-ad-label">Реклама</span>` satisfies US-09.04's template-enforcement requirement. The existing CSS `::before` pseudo-element is replaced by styling `.pn-ad-label` directly, so the label cannot be suppressed via per-slot CSS overrides.
 
 ### Layout Changes (`_Layout.cshtml`)
 
@@ -163,7 +170,9 @@ public interface IAdSlotRepository
 
 ### Sponsored Link Rewriting
 
-**`PredelNews.Web/Helpers/SponsoredLinkRewriter.cs`** — static `HtmlHelper` extension:
+**`PredelNews.Web/Helpers/SponsoredLinkRewriter.cs`** — static `HtmlHelper` extension.
+
+**Dependency:** requires `HtmlAgilityPack` NuGet package added to `PredelNews.Web.csproj`.
 
 ```csharp
 public static IHtmlContent RewriteSponsoredLinks(
@@ -233,6 +242,8 @@ public record UpdateAdSlotRequest(
 );
 ```
 
+**Descoped:** US-09.02 mentions an optional impression tracking pixel. This is explicitly excluded at MVP — it falls under "Direct ad reporting (impression/click counts) — Phase 2" in the EPIC Out of Scope list. No `TrackingPixelUrl` field is added to the model or the request DTO.
+
 ### Validation
 
 - `Mode == "direct"` → `BannerImageUrl` and `BannerDestUrl` required
@@ -268,7 +279,7 @@ public record UpdateAdSlotRequest(
 | `Core/Services/IAdSlotService.cs` | Core |
 | `Core/Services/AdSlotService.cs` | Core |
 | `Infrastructure/Repositories/AdSlotRepository.cs` | Infrastructure |
-| `Infrastructure/Migrations/AlterAdSlotsV2Migration.cs` | Infrastructure |
+| `Infrastructure/Migrations/AlterAdSlotsV3Migration.cs` | Infrastructure — GUID `6A1B2C3D-0003-4000-8000-000000000003` |
 | `Web/ViewComponents/AdSlotViewComponent.cs` | Web |
 | `Web/Views/Shared/Components/AdSlot/_AdSlot.cshtml` | Web |
 | `Web/Helpers/SponsoredLinkRewriter.cs` | Web |
@@ -284,6 +295,7 @@ public record UpdateAdSlotRequest(
 | `Article.cshtml` | Replace static ad divs; use `RenderArticleBody` helper |
 | `_SponsoredBanner.cshtml` | Add sponsor name from `ViewData` |
 | `site.css` | Responsive sidebar hiding, mobile sticky, CLS min-heights |
-| `Core/Extensions/ServiceCollectionExtensions.cs` | Register `IAdSlotService` → `AdSlotService` |
-| `Infrastructure/Extensions/ServiceCollectionExtensions.cs` | Register `IAdSlotRepository` → `AdSlotRepository` |
-| `Infrastructure/Migrations/PredelNewsMigrationPlan.cs` | Add V2 migration step |
+| `Core/Extensions/ServiceCollectionExtensions.cs` | Register `IAdSlotService` → `AdSlotService` as **`AddSingleton`** |
+| `Infrastructure/Extensions/ServiceCollectionExtensions.cs` | Register `IAdSlotRepository` → `AdSlotRepository` as `AddScoped` |
+| `Infrastructure/Migrations/PredelNewsMigrationPlan.cs` | Add V3 migration step with GUID `6A1B2C3D-0003-4000-8000-000000000003` |
+| `PredelNews.Web.csproj` | Add `<PackageReference Include="HtmlAgilityPack" Version="1.11.*" />` |
