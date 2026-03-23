@@ -1,3 +1,7 @@
+@inject PredelNews.Core.Services.ISiteSettingsService SiteSettingsService
+@{
+    var _adsenseTag = SiteSettingsService.GetSiteSettings().AdsenseScriptTag;
+}
 <!DOCTYPE html>
 <html lang="bg">
 <head>
@@ -8,6 +12,10 @@
   @await Html.PartialAsync("_SeoMeta")
   @await Html.PartialAsync("_BreadcrumbJsonLd")
   @await Html.PartialAsync("_GoogleAnalytics")
+  @if (!string.IsNullOrEmpty(_adsenseTag))
+  {
+    @Html.Raw(_adsenseTag)
+  }
   <link rel="icon" href="~/favicon.ico" sizes="any">
   <link rel="icon" href="~/images/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="~/images/apple-touch-icon.png">
@@ -59,6 +67,11 @@
   @RenderBody()
 </main>
 
+<!-- Ad: Footer Banner -->
+<div class="container my-3">
+  @await Component.InvokeAsync("AdSlot", new { slotId = "footer-banner" })
+</div>
+
 <!-- FOOTER -->
 <footer class="pn-footer pt-5 pb-3">
   <div class="container">
@@ -100,5 +113,8 @@
 <script src="~/js/share.js?v=3.0.0" defer></script>
 <script src="~/js/search.js?v=1.0.0" defer></script>
 @RenderSection("Scripts", required: false)
+
+<!-- Ad: Mobile Sticky -->
+@await Component.InvokeAsync("AdSlot", new { slotId = "mobile-sticky" })
 </body>
 </html>
