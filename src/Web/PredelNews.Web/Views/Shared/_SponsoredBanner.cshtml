@@ -1,3 +1,7 @@
+@{
+    var sponsorName = ViewData["SponsorName"] as string;
+}
 <div class="pn-sponsored-banner d-flex align-items-center gap-2">
-    <i class="bi bi-info-circle"></i> Платена публикация
+    <i class="bi bi-info-circle"></i>
+    <span>Платена публикация@(!string.IsNullOrEmpty(sponsorName) ? $" от {sponsorName}" : "")</span>
 </div>

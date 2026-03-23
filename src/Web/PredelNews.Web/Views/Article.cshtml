@@ -2,7 +2,7 @@
 
 <!-- Ad: Header Leaderboard -->
 <div class="container my-3">
-  <div class="pn-ad-slot pn-ad-leaderboard"><span>728 &times; 90</span></div>
+  @await Component.InvokeAsync("AdSlot", new { slotId = "header-leaderboard" })
 </div>
 
 <div class="container py-4">
@@ -14,7 +14,7 @@
         @if (Model.IsSponsored)
         {
           <div class="mb-3">
-            @await Html.PartialAsync("_SponsoredBanner")
+            @await Html.PartialAsync("_SponsoredBanner", null, new ViewDataDictionary(ViewData) { { "SponsorName", Model.SponsorName } })
           </div>
         }
 
@@ -73,8 +73,18 @@
 
         @await Html.PartialAsync("_ShareButtons", null, new ViewDataDictionary(ViewData) { { "ShareUrl", Model.ShareUrl } })
 
+        @{
+            var (bodyBefore, bodyAfter) = PredelNews.Core.Services.ArticleBodyProcessor.SplitAtParagraph(Model.Body, 3);
+        }
         <div class="pn-article-body mt-4">
-          @Html.Raw(Model.Body)
+          @Html.RenderArticleBody(bodyBefore, Model.IsSponsored)
+          @if (!string.IsNullOrEmpty(bodyAfter))
+          {
+            <div class="my-3">
+              @await Component.InvokeAsync("AdSlot", new { slotId = "article-inline" })
+            </div>
+            @Html.RenderArticleBody(bodyAfter, Model.IsSponsored)
+          }
         </div>
 
         @if (Model.Tags.Count > 0)
@@ -92,11 +102,13 @@
         @if (Model.IsSponsored)
         {
           <div class="mt-3">
-            @await Html.PartialAsync("_SponsoredBanner")
+            @await Html.PartialAsync("_SponsoredBanner", null, new ViewDataDictionary(ViewData) { { "SponsorName", Model.SponsorName } })
           </div>
         }
 
-        <div class="pn-ad-slot pn-ad-article-bottom my-4"><span>728 &times; 90</span></div>
+        <div class="my-4">
+          @await Component.InvokeAsync("AdSlot", new { slotId = "article-bottom" })
+        </div>
 
         <!-- Related -->
         @if (Model.RelatedArticles.Count > 0)
@@ -138,7 +150,9 @@
 
     <!-- Sidebar -->
     <aside class="col-lg-4">
-      <div class="pn-ad-slot pn-ad-sidebar mb-4"><span>300 &times; 250</span></div>
+      @await Component.InvokeAsync("AdSlot", new { slotId = "sidebar-top" })
+      <div class="mb-4"></div>
+      @await Component.InvokeAsync("AdSlot", new { slotId = "sidebar-bottom" })
       <div class="pn-widget p-3 mb-4">
         <h3 class="pn-widget-title mb-3">Най-четено</h3>
         <ol class="pn-most-read">
