@@ -11,5 +11,6 @@ public class PredelNewsMigrationPlan : PackageMigrationPlan
     {
         To<CreateCustomTablesV1Migration>(new Guid("6A1B2C3D-0001-4000-8000-000000000001"));
         To<AlterPollTablesV2Migration>(new Guid("6A1B2C3D-0002-4000-8000-000000000002"));
+        To<AlterAdSlotsV3Migration>(new Guid("6A1B2C3D-0003-4000-8000-000000000003"));
     }
 }
