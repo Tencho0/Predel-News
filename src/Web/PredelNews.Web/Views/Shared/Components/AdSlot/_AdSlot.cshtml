@@ -1,0 +1,17 @@
+@model PredelNews.Core.Models.AdSlot
+
+<div class="pn-ad-slot pn-ad-@Model.SlotId">
+  <span class="pn-ad-label">Реклама</span>
+  @if (Model.IsDirectActive)
+  {
+    <a href="@Model.BannerDestUrl" rel="noopener" target="_blank">
+      <img src="@Model.BannerImageUrl"
+           alt="@(Model.BannerAltText ?? "Реклама")"
+           class="img-fluid w-100">
+    </a>
+  }
+  else if (!string.IsNullOrEmpty(Model.AdsenseCode))
+  {
+    @Html.Raw(Model.AdsenseCode)
+  }
+</div>
